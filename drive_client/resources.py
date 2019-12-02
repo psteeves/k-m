@@ -39,7 +39,9 @@ class Scraper:
         ).execute()
 
     def get_file_permissions(self, file_id):
-        return self._permissions_resource.list(fileId=file_id).execute()["permissions"]
+        return self._permissions_resource.list(fileId=file_id, fields="*").execute()[
+            "permissions"
+        ]
 
     def get_permission_details(self, file_id, permission_id):
         return self._permissions_resource.get(
