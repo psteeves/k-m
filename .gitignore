@@ -1,4 +1,7 @@
-credentials.json
-token.pickle
 **/.idea
 **/__pycache__
+
+client_id.json
+storage.json
+poetry.lock
+
