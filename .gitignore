@@ -1,6 +1,7 @@
 **/.idea
 **/__pycache__
 
+.nltk-data
 client_id.json
 storage.json
 poetry.lock
