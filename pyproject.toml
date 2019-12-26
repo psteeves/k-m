@@ -2,14 +2,14 @@
 name = "intelligent-knowledge-management"
 version = "0.1.0"
 description = ""
-authors = ["Pat Steeves <patrick.steeves@elementai.com>"]
+authors = ["Pat Steeves <patricksteeves02@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
 google-api-python-client = "^1.7.11"
-google-auth-httplib2 = "^0.0.3"
-google-auth-oauthlib = "^0.4.1"
 structlog = "^19.2"
+nltk = "^3.4"
+oauth2client = "^4.1"
 
 [tool.poetry.dev-dependencies]
 
