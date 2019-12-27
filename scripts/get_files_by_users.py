@@ -5,8 +5,11 @@ from collections import defaultdict
 from structlog import get_logger
 
 from drive_client.resources import Scraper
-from nlp.text_cleaning import (decode_string, replace_unicode_quotations,
-                                 strip_whitespace)
+from nlp.text_cleaning import (
+    decode_string,
+    replace_unicode_quotations,
+    strip_whitespace,
+)
 
 logger = get_logger()
 
@@ -44,7 +47,7 @@ def main():
         )
 
         files[file_id] = file_text
-        
+
         # Get file permisssions
         file_permissions = scraper.get_file_permissions(file_id)
         for permission in file_permissions:
