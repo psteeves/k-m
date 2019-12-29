@@ -5,9 +5,11 @@ from collections import defaultdict
 from structlog import get_logger
 
 from drive_client.resources import Scraper
-from nlp.tokenizer import Tokenizer
-from nlp.text_cleaning import (decode_string, replace_unicode_quotations,
-                                 strip_whitespace)
+from nlp.text_cleaning import (
+    decode_string,
+    replace_unicode_quotations,
+    strip_whitespace,
+)
 
 logger = get_logger()
 
@@ -33,7 +35,6 @@ def parse_args():
 def main():
     args = parse_args()
     scraper = Scraper()
-    tokenizer = Tokenizer()
 
     files = {}
     users = defaultdict(list)
@@ -44,9 +45,9 @@ def main():
         file_text = strip_whitespace(
             replace_unicode_quotations(decode_string(file_content))
         )
-        file_tokens = tokenizer.tokenize(file_text)
-        files[file_id] = file_tokens
-        
+
+        files[file_id] = file_text
+
         # Get file permisssions
         file_permissions = scraper.get_file_permissions(file_id)
         for permission in file_permissions:
