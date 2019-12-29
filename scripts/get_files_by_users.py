@@ -4,8 +4,8 @@ from collections import defaultdict
 
 from structlog import get_logger
 
-from drive_client.resources import Scraper
-from nlp.text_cleaning import (
+from km.drive_client.resources import Scraper
+from km.nlp.text_cleaning import (
     decode_string,
     replace_unicode_quotations,
     strip_whitespace,
@@ -32,8 +32,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def main():
-    args = parse_args()
+def main(args):
     scraper = Scraper()
 
     files = {}
@@ -64,4 +63,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_args()
+    main(args)
