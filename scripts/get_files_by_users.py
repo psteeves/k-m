@@ -5,11 +5,8 @@ from collections import defaultdict
 from structlog import get_logger
 
 from km.drive_client.resources import Scraper
-from km.nlp.text_cleaning import (
-    decode_string,
-    replace_unicode_quotations,
-    strip_whitespace,
-)
+from km.nlp.text_cleaning import (decode_string, replace_unicode_quotations,
+                                  strip_whitespace)
 
 logger = get_logger()
 

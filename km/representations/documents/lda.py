@@ -1,6 +1,7 @@
+from typing import List
+
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import CountVectorizer
-from typing import List
 
 
 class LDAModel:
