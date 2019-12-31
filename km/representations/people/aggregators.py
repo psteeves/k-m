@@ -17,3 +17,6 @@ class DocumentAggregator:
         doc_representations = self._topic_model.transform(documents)
         aggregated_rep = self._aggregator(doc_representations)
         return aggregated_rep
+
+    def fit(self, data):
+        self._topic_model.fit(data)
