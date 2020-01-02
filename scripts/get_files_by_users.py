@@ -5,8 +5,11 @@ from collections import defaultdict
 from structlog import get_logger
 
 from km.drive_client.resources import Scraper
-from km.nlp.text_cleaning import (decode_string, replace_unicode_quotations,
-                                  strip_whitespace)
+from km.nlp.text_cleaning import (
+    decode_string,
+    replace_unicode_quotations,
+    strip_whitespace,
+)
 
 logger = get_logger()
 
@@ -25,7 +28,9 @@ def parse_args():
         required=True,
         help="Output file to dump info about users",
     )
-    parser.add_argument("-m", "--max-num-files", type=int, help="Max number of files to scrape")
+    parser.add_argument(
+        "-m", "--max-num-files", type=int, help="Max number of files to scrape"
+    )
 
     return parser.parse_args()
 
@@ -37,7 +42,7 @@ def run(args):
     users = defaultdict(list)
     response = scraper.list_drive_files()
     if args.max_num_files is not None:
-        response = response[:args.max_num_files]
+        response = response[: args.max_num_files]
 
     for resp in response:
         # Get file contents

@@ -8,7 +8,9 @@ def test_doc_representations(doc_model, documents):
     assert len(representations) == len(documents)
 
     # Check topics sum to 1
-    np.testing.assert_allclose(representations.sum(axis=1), np.ones((len(representations))))
+    np.testing.assert_allclose(
+        representations.sum(axis=1), np.ones((len(representations)))
+    )
 
     # All documents are very topic-specific, so the representations should have high variance
     for rep in representations:

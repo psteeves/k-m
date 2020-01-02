@@ -1,9 +1,10 @@
 import json
+
 import numpy as np
 
+from km.metrics.similarity import EuclidianSimilarity
 from km.representations.documents.lda import LDAModel
 from km.representations.people.aggregators import DocumentAggregator
-from km.metrics.similarity import EuclidianSimilarity
 
 _FILE_LOCATION = "/home/psteeves/k-m/intelligent-knowledge-management/files.json"
 _USER_LOCATION = "/home/psteeves/k-m/intelligent-knowledge-management/users.json"
@@ -48,6 +49,9 @@ class Orchestrator:
         representation = self.describe_documents(doc)
         reference_reps = self.describe_documents(self._documents)
 
-        similarity_scores = [self._similarity_measure(representation, reference) for reference in reference_reps]
+        similarity_scores = [
+            self._similarity_measure(representation, reference)
+            for reference in reference_reps
+        ]
         sorted_scores = np.argsort(similarity_scores)[::-1]
         return sorted_scores
