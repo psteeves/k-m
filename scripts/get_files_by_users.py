@@ -25,16 +25,21 @@ def parse_args():
         required=True,
         help="Output file to dump info about users",
     )
+    parser.add_argument("-m", "--max-num-files", type=int, help="Max number of files to scrape")
 
     return parser.parse_args()
 
 
-def main(args):
+def run(args):
     scraper = Scraper()
 
     files = {}
     users = defaultdict(list)
-    for resp in scraper.list_drive_files():
+    response = scraper.list_drive_files()
+    if args.max_num_files is not None:
+        response = response[:args.max_num_files]
+
+    for resp in response:
         # Get file contents
         file_id = resp["id"]
         file_content = scraper.get_file_text_content(file_id)
@@ -61,4 +66,4 @@ def main(args):
 
 if __name__ == "__main__":
     args = parse_args()
-    main(args)
+    run(args)
