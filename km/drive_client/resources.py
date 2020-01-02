@@ -1,6 +1,16 @@
+from collections import defaultdict
+from typing import List, Tuple
+
 from googleapiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
+
+from km.data_models import Document, Permission, Person
+from km.nlp.text_cleaning import (
+    decode_string,
+    replace_unicode_quotations,
+    strip_whitespace,
+)
 
 SCOPES = "https://www.googleapis.com/auth/drive"
 SUPPORTED_MIMETYPES = [
@@ -29,21 +39,65 @@ class Scraper:
             creds = tools.run_flow(flow, store)
         return creds
 
-    def list_drive_files(self):
+    def list_drive_files(self) -> List[Document]:
         all_files = self._files_resource.list().execute()["files"]
-        return [f for f in all_files if f["mimeType"] in self._supported_mimetypes]
-
-    def get_file_text_content(self, file_id):
-        return self._files_resource.export_media(
-            fileId=file_id, mimeType="text/plain"
-        ).execute()
-
-    def get_file_permissions(self, file_id):
-        return self._permissions_resource.list(fileId=file_id, fields="*").execute()[
-            "permissions"
+        supported_files = [
+            Document.deserialize(f)
+            for f in all_files
+            if f["mimeType"] in self._supported_mimetypes
         ]
+        files_with_content = [self._get_file_text_content(f) for f in supported_files]
 
-    def get_permission_details(self, file_id, permission_id):
-        return self._permissions_resource.get(
-            fileId=file_id, permissionId=permission_id, fields="*"
+        return files_with_content
+
+    def _get_file_text_content(self, document: Document) -> Document:
+        content = self._files_resource.export_media(
+            fileId=document.id, mimeType="text/plain"
         ).execute()
+        document.text = self._clean_file_content(content)
+        return document
+
+    def _clean_file_content(self, text: bytes) -> str:
+        text = strip_whitespace(replace_unicode_quotations(decode_string(text)))
+        return text
+
+    def list_users_from_file_ids(self, files: List[Document]) -> List[Person]:
+        user_emails_with_permissions = defaultdict(list)
+        for f in files:
+            # Don't save text in permissions
+            f.text = None
+            permissions = self.get_file_permissions(f)
+            for email, permission in permissions:
+                user_emails_with_permissions[email].append(permission)
+
+        users = []
+        for email, permissions in user_emails_with_permissions.items():
+            users.append(
+                Person.deserialize(
+                    {
+                        "email": email,
+                        "permissions": [p.serialize() for p in permissions],
+                    }
+                )
+            )
+        return users
+
+    def get_file_permissions(self, file: Document) -> List[Tuple[str, Permission]]:
+        # Make sure we're not saving the document content
+        file_permissions = self._permissions_resource.list(
+            fileId=file.id, fields="*"
+        ).execute()["permissions"]
+
+        return [
+            (
+                permission["emailAddress"],
+                Permission.deserialize(
+                    {
+                        "id": permission["id"],
+                        "role": permission["role"],
+                        "document": file.serialize(),
+                    }
+                ),
+            )
+            for permission in file_permissions
+        ]

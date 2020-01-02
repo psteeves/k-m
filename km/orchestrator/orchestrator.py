@@ -1,4 +1,5 @@
 import json
+from typing import List
 
 import numpy as np
 
@@ -45,9 +46,20 @@ class Orchestrator:
         people = json.load(open(_USER_LOCATION))
         return people
 
-    def get_similar_docs(self, doc):
-        representation = self.describe_documents(doc)
+    def query_docs(self, query: str) -> List[str]:
+        representation = self.describe_documents(query)
         reference_reps = self.describe_documents(self._documents)
+
+        similarity_scores = [
+            self._similarity_measure(representation, reference)
+            for reference in reference_reps
+        ]
+        sorted_scores = np.argsort(similarity_scores)[::-1]
+        return sorted_scores
+
+    def query_people(self, query: str) -> List[str]:
+        representation = self.describe_documents(query)
+        reference_reps = self.describe_documents(self._people)
 
         similarity_scores = [
             self._similarity_measure(representation, reference)

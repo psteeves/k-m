@@ -1,15 +1,9 @@
 import argparse
 import json
-from collections import defaultdict
 
 from structlog import get_logger
 
 from km.drive_client.resources import Scraper
-from km.nlp.text_cleaning import (
-    decode_string,
-    replace_unicode_quotations,
-    strip_whitespace,
-)
 
 logger = get_logger()
 
@@ -38,35 +32,26 @@ def parse_args():
 def run(args):
     scraper = Scraper()
 
-    files = {}
-    users = defaultdict(list)
     response = scraper.list_drive_files()
     if args.max_num_files is not None:
         response = response[: args.max_num_files]
 
-    for resp in response:
-        # Get file contents
-        file_id = resp["id"]
-        file_content = scraper.get_file_text_content(file_id)
-        file_text = strip_whitespace(
-            replace_unicode_quotations(decode_string(file_content))
-        )
-
-        files[file_id] = file_text
-
-        # Get file permisssions
-        file_permissions = scraper.get_file_permissions(file_id)
-        for permission in file_permissions:
-            users[permission["emailAddress"]].append(
-                {"file_id": file_id, "role": permission["role"]}
-            )
-
-    json.dump(users, open(args.users_output, "w"), indent=2, sort_keys=True)
-    json.dump(files, open(args.files_output, "w"), indent=2, sort_keys=True)
-
-    logger.info(
-        f"File, user contents saved to {args.files_output}, {args.users_output}"
+    json.dump(
+        [f.serialize() for f in response],
+        open(args.files_output, "w"),
+        indent=2,
+        sort_keys=True,
     )
+    logger.info(f"File contents saved to {args.files_output}")
+
+    users = scraper.list_users_from_file_ids(response)
+    json.dump(
+        [u.serialize() for u in users],
+        open(args.users_output, "w"),
+        indent=2,
+        sort_keys=True,
+    )
+    logger.info(f"Users with permissions saved to {args.users_output}")
 
 
 if __name__ == "__main__":
