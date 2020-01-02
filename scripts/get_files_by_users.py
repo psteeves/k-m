@@ -4,8 +4,8 @@ from collections import defaultdict
 
 from structlog import get_logger
 
-from drive_client.resources import Scraper
-from nlp.text_cleaning import (
+from km.drive_client.resources import Scraper
+from km.nlp.text_cleaning import (
     decode_string,
     replace_unicode_quotations,
     strip_whitespace,
@@ -28,17 +28,23 @@ def parse_args():
         required=True,
         help="Output file to dump info about users",
     )
+    parser.add_argument(
+        "-m", "--max-num-files", type=int, help="Max number of files to scrape"
+    )
 
     return parser.parse_args()
 
 
-def main():
-    args = parse_args()
+def run(args):
     scraper = Scraper()
 
     files = {}
     users = defaultdict(list)
-    for resp in scraper.list_drive_files():
+    response = scraper.list_drive_files()
+    if args.max_num_files is not None:
+        response = response[: args.max_num_files]
+
+    for resp in response:
         # Get file contents
         file_id = resp["id"]
         file_content = scraper.get_file_text_content(file_id)
@@ -64,4 +70,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_args()
+    run(args)

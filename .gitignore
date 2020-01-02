@@ -1,5 +1,6 @@
 **/.idea
 **/__pycache__
+**/.ipynb_checkpoints
 
 .nltk-data
 client_id.json
