@@ -14,10 +14,21 @@ class Document:
     @classmethod
     def deserialize(cls, data: Dict[str, str]):
         text = data.get("text")
-        return cls(id=data["id"], name=data["name"], text=text)
+        representation = data.get("representation")
+        return cls(
+            id=data["id"], name=data["name"], text=text, representation=representation
+        )
 
     def serialize(self) -> Dict[str, str]:
-        return {"id": self.id, "name": self.name, "text": self.text}
+        representation = (
+            self.representation.tolist() if self.representation is not None else None
+        )
+        return {
+            "id": self.id,
+            "name": self.name,
+            "text": self.text,
+            "representation": representation,
+        }
 
 
 @dataclasses.dataclass

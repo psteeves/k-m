@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -7,27 +8,22 @@ from km.representations.documents.lda import LDAModel
 from km.representations.people.aggregators import DocumentAggregator
 
 _FIXTURES_DIR = Path(__file__).parent / "fixtures"
-_DOCS_DIR = _FIXTURES_DIR / "documents"
 
 
 @pytest.fixture
-def documents():
-    docs = []
-    doc_paths = _DOCS_DIR.iterdir()
-    for i, path in enumerate(doc_paths):
-        with open(path) as f:
-            text_content = f.read()
-            docs.append(
-                Document.deserialize(
-                    {"id": str(i), "name": "title", "text": text_content}
-                )
-            )
-    return docs
+def docs_file():
+    return _FIXTURES_DIR / "documents" / "documents.json"
+
+
+@pytest.fixture
+def documents(docs_file):
+    docs = json.load(open(docs_file))
+    return [Document.deserialize(doc) for doc in docs]
 
 
 @pytest.fixture
 def doc_model():
-    return LDAModel(3)
+    return LDAModel(4)
 
 
 @pytest.fixture
