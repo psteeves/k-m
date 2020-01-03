@@ -2,7 +2,7 @@ import numpy as np
 
 
 def test_document_aggregator(people_model, documents):
-    business_documents = [doc for doc in documents if doc[:2] == "Be"]
+    business_documents = [doc for doc in documents if doc.text[:2] == "Be"]
     assert len(business_documents) == 2
 
     people_model.fit(documents)

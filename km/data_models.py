@@ -1,12 +1,15 @@
 import dataclasses
 from typing import Any, Dict, List, Optional
 
+import numpy as np
+
 
 @dataclasses.dataclass
 class Document:
     id: str
     name: str
     text: Optional[str] = None
+    representation: Optional[np.array] = None
 
     @classmethod
     def deserialize(cls, data: Dict[str, str]):
@@ -40,6 +43,7 @@ class Permission:
 class Person:
     email: str
     permissions: List[Permission]
+    representation: Optional[np.array] = None
 
     @classmethod
     def deserialize(cls, data: Dict[str, Any]):

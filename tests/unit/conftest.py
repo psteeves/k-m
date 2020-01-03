@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 
+from km.data_models import Document
 from km.representations.documents.lda import LDAModel
 from km.representations.people.aggregators import DocumentAggregator
 
@@ -13,9 +14,14 @@ _DOCS_DIR = _FIXTURES_DIR / "documents"
 def documents():
     docs = []
     doc_paths = _DOCS_DIR.iterdir()
-    for path in doc_paths:
+    for i, path in enumerate(doc_paths):
         with open(path) as f:
-            docs.append(f.read())
+            text_content = f.read()
+            docs.append(
+                Document.deserialize(
+                    {"id": str(i), "name": "title", "text": text_content}
+                )
+            )
     return docs
 
 

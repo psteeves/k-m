@@ -3,8 +3,11 @@ from typing import List
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import CountVectorizer
 
+from km.data_models import Document
+from km.representations.documents.base import BaseDocRepresentation
 
-class LDAModel:
+
+class LDAModel(BaseDocRepresentation):
     def __init__(self, n_components, max_df=0.9, min_df=2):
         self._count_vectorizer = CountVectorizer(
             max_df=max_df, min_df=min_df, stop_words="english"
@@ -13,12 +16,14 @@ class LDAModel:
             n_components=n_components, random_state=666
         )
 
-    def fit(self, data: List[str]):
-        term_frequencies = self._count_vectorizer.fit_transform(data)
+    def fit(self, documents: List[Document]) -> None:
+        texts = [doc.text for doc in documents]
+        term_frequencies = self._count_vectorizer.fit_transform(texts)
         self._lda_model.fit(term_frequencies)
 
-    def transform(self, data: List[str]):
-        term_frequencies = self._count_vectorizer.transform(data)
+    def transform(self, documents: List[Document]):
+        texts = [doc.text for doc in documents]
+        term_frequencies = self._count_vectorizer.transform(texts)
         return self._lda_model.transform(term_frequencies)
 
     def explain(self):

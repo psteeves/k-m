@@ -3,6 +3,7 @@ from typing import List
 
 import numpy as np
 
+from km.data_models import Document, Permission, Person
 from km.metrics.similarity import EuclidianSimilarity
 from km.representations.documents.lda import LDAModel
 from km.representations.people.aggregators import DocumentAggregator
@@ -40,11 +41,11 @@ class Orchestrator:
 
     def _get_documents(self):
         documents = json.load(open(_FILE_LOCATION))
-        return list(documents.values())
+        return [Document.deserialize(doc) for doc in documents]
 
     def _get_people(self):
         people = json.load(open(_USER_LOCATION))
-        return people
+        return [Person.deserialize(person) for person in people]
 
     def query_docs(self, query: str) -> List[str]:
         representation = self.describe_documents(query)
