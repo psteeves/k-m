@@ -1,20 +1,37 @@
 import dataclasses
 from typing import Any, Dict, List, Optional
 
+import numpy as np
+
 
 @dataclasses.dataclass
 class Document:
     id: str
     name: str
     text: Optional[str] = None
+    representation: Optional[np.array] = None
 
     @classmethod
     def deserialize(cls, data: Dict[str, str]):
         text = data.get("text")
-        return cls(id=data["id"], name=data["name"], text=text)
+        representation = data.get("representation")
+        return cls(
+            id=data["id"], name=data["name"], text=text, representation=representation
+        )
 
     def serialize(self) -> Dict[str, str]:
-        return {"id": self.id, "name": self.name, "text": self.text}
+        representation = (
+            self.representation.tolist() if self.representation is not None else None
+        )
+        return {
+            "id": self.id,
+            "name": self.name,
+            "text": self.text,
+            "representation": representation,
+        }
+
+    def __repr__(self):
+        return f"Document(title={self.name})"
 
 
 @dataclasses.dataclass
@@ -40,6 +57,7 @@ class Permission:
 class Person:
     email: str
     permissions: List[Permission]
+    representation: Optional[np.array] = None
 
     @classmethod
     def deserialize(cls, data: Dict[str, Any]):
@@ -51,3 +69,6 @@ class Person:
     def serialize(self) -> Dict[str, Any]:
         permissions = [p.serialize() for p in self.permissions]
         return {"email": self.email, "permissions": permissions}
+
+    def __repr__(self):
+        return f"Person(email={self.email}, num_permissions={len(self.permissions)})"
