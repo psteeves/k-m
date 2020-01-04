@@ -61,11 +61,9 @@ class Scraper:
         text = strip_whitespace(replace_unicode_quotations(decode_string(text)))
         return text
 
-    def list_users_from_file_ids(self, files: List[Document]) -> List[Person]:
+    def list_users_from_documents(self, files: List[Document]) -> List[Person]:
         user_emails_with_permissions = defaultdict(list)
         for f in files:
-            # Don't save text in permissions
-            f.text = None
             permissions = self.get_file_permissions(f)
             for email, permission in permissions:
                 user_emails_with_permissions[email].append(permission)

@@ -44,7 +44,7 @@ def run(args):
     )
     logger.info(f"File contents saved to {args.files_output}")
 
-    users = scraper.list_users_from_file_ids(response)
+    users = scraper.list_users_from_documents(response)
     json.dump(
         [u.serialize() for u in users],
         open(args.users_output, "w"),

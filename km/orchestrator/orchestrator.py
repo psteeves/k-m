@@ -9,6 +9,7 @@ from km.representations.documents.base import BaseDocRepresentation
 from km.representations.documents.lda import LDAModel
 from km.representations.people.aggregators import DocumentAggregator
 from km.representations.people.base import BasePersonRepresentation
+from km.utils import make_document
 
 _DEFAULT_FILES_LOCATION = (
     "/home/psteeves/k-m/intelligent-knowledge-management/files.json"
@@ -23,14 +24,14 @@ logger = structlog.get_logger(__name__)
 class Orchestrator:
     def __init__(
         self,
-        document_model: BaseDocRepresentation,
-        people_model: BasePersonRepresentation,
-        similarity_measure,
+        document_model: BaseDocRepresentation = None,
+        people_model: BasePersonRepresentation = None,
+        similarity_measure=None,
         docs_path: str = _DEFAULT_FILES_LOCATION,
         people_path: str = _DEFAULT_USERS_LOCATION,
     ):
         if document_model is None:
-            document_model = LDAModel(n_components=10)
+            document_model = LDAModel(n_components=5)
 
         if people_model is None:
             people_model = DocumentAggregator(document_model)
@@ -54,8 +55,9 @@ class Orchestrator:
         people = json.load(open(path))
         return [Person.deserialize(person) for person in people]
 
-    def fit(self, documents):
-        self._document_model.fit(documents)
+    def fit(self):
+        self._document_model.fit(self._documents)
+        return self._document_model.explain()
 
     def describe_documents(self, input_):
         return self._document_model.transform(input_)
@@ -64,7 +66,7 @@ class Orchestrator:
         return self._people_model.transform(input_)
 
     def query_docs(self, query: str) -> List[Tuple[Document, float]]:
-        query_doc = Document(id="-1", name="query", text=query)
+        query_doc = make_document(query)
         representation = self.describe_documents([query_doc])
         reference_reps = self.describe_documents(self._documents)
 
@@ -76,11 +78,12 @@ class Orchestrator:
         return sorted_scores
 
     def query_people(self, query: str) -> List[Tuple[Person, float]]:
-        representation = self.describe_documents(query)
-        reference_reps = self.describe_documents(self._people)
+        query_doc = make_document(query)
+        representation = self.describe_documents([query_doc])
+        reference_reps = self.describe_people(self._people)
 
         people_with_similarity_scores = [
-            self._similarity_measure(representation, reference)
+            (person, self._similarity_measure(representation, reference))
             for person, reference in zip(self._people, reference_reps)
         ]
         sorted_scores = sorted(people_with_similarity_scores, key=lambda x: x[1])

@@ -30,6 +30,9 @@ class Document:
             "representation": representation,
         }
 
+    def __repr__(self):
+        return f"Document(title={self.name})"
+
 
 @dataclasses.dataclass
 class Permission:
@@ -66,3 +69,6 @@ class Person:
     def serialize(self) -> Dict[str, Any]:
         permissions = [p.serialize() for p in self.permissions]
         return {"email": self.email, "permissions": permissions}
+
+    def __repr__(self):
+        return f"Person(email={self.email}, num_permissions={len(self.permissions)})"
