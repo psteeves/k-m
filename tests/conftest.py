@@ -16,6 +16,11 @@ def docs_file():
 
 
 @pytest.fixture
+def people_file():
+    return _FIXTURES_DIR / "people" / "people.json"
+
+
+@pytest.fixture
 def documents(docs_file):
     docs = json.load(open(docs_file))
     return [Document.deserialize(doc) for doc in docs]
