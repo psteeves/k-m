@@ -85,9 +85,7 @@ class Orchestrator:
     def describe_documents(self, documents: List[Document]) -> np.array:
         return self._document_model.transform(documents)
 
-    def query_documents(
-        self, query: str, max_docs: int = 10
-    ) -> List[Tuple[Document, float]]:
+    def query_documents(self, query: str, max_docs: int = 10) -> List[Document]:
         query_doc = make_document(query)
         representation = self.describe_documents([query_doc])
 

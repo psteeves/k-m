@@ -42,20 +42,25 @@ class Scraper:
     def list_drive_files(self) -> List[Document]:
         all_files = self._files_resource.list().execute()["files"]
         supported_files = [
-            Document.deserialize(f)
-            for f in all_files
-            if f["mimeType"] in self._supported_mimetypes
+            f for f in all_files if f["mimeType"] in self._supported_mimetypes
         ]
-        files_with_content = [self._get_file_text_content(f) for f in supported_files]
+        documents = [
+            Document.deserialize(
+                {
+                    "id": f["id"],
+                    "title": f["name"],
+                    "content": self._get_file_text_content(f["id"]),
+                }
+            )
+            for f in supported_files
+        ]
+        return documents
 
-        return files_with_content
-
-    def _get_file_text_content(self, document: Document) -> Document:
+    def _get_file_text_content(self, document_id: str) -> str:
         content = self._files_resource.export_media(
-            fileId=document.id, mimeType="text/plain"
+            fileId=document_id, mimeType="text/plain"
         ).execute()
-        document.text = self._clean_file_content(content)
-        return document
+        return self._clean_file_content(content)
 
     def _clean_file_content(self, text: bytes) -> str:
         text = strip_whitespace(replace_unicode_quotations(decode_string(text)))
@@ -93,7 +98,7 @@ class Scraper:
                     {
                         "id": permission["id"],
                         "role": permission["role"],
-                        "document": file.serialize(),
+                        "document_id": file.id,
                     }
                 ),
             )
