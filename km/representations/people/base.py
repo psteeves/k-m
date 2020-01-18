@@ -6,7 +6,7 @@ import numpy as np
 from km.data_models import Document
 
 
-class BasePersonRepresentation:
+class BaseUserRepresentation:
     @abc.abstractmethod
     def fit(self, documents: List[Document]) -> None:
         pass

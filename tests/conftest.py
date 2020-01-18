@@ -11,19 +11,19 @@ _FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
 @pytest.fixture
-def docs_file():
-    return _FIXTURES_DIR / "documents" / "documents.json"
+def data_path():
+    return _FIXTURES_DIR / "test_data"
 
 
 @pytest.fixture
-def people_file():
-    return _FIXTURES_DIR / "people" / "people.json"
-
-
-@pytest.fixture
-def documents(docs_file):
-    docs = json.load(open(docs_file))
-    return [Document.deserialize(doc) for doc in docs]
+def documents(data_path):
+    documents_path = data_path / "documents"
+    documents = []
+    for doc_path in documents_path.iterdir():
+        doc_dict = {"id": doc_path.stem}
+        doc_dict.update(json.load(open(doc_path)))
+        documents.append(doc_dict)
+    return [Document.deserialize(d) for d in documents]
 
 
 @pytest.fixture

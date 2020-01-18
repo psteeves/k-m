@@ -5,7 +5,7 @@ from googleapiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
 
-from km.data_models import Document, Permission, Person
+from km.data_models import Document, Permission, User
 from km.nlp.text_cleaning import (
     decode_string,
     replace_unicode_quotations,
@@ -42,26 +42,31 @@ class Scraper:
     def list_drive_files(self) -> List[Document]:
         all_files = self._files_resource.list().execute()["files"]
         supported_files = [
-            Document.deserialize(f)
-            for f in all_files
-            if f["mimeType"] in self._supported_mimetypes
+            f for f in all_files if f["mimeType"] in self._supported_mimetypes
         ]
-        files_with_content = [self._get_file_text_content(f) for f in supported_files]
+        documents = [
+            Document.deserialize(
+                {
+                    "id": f["id"],
+                    "title": f["name"],
+                    "content": self._get_file_text_content(f["id"]),
+                }
+            )
+            for f in supported_files
+        ]
+        return documents
 
-        return files_with_content
-
-    def _get_file_text_content(self, document: Document) -> Document:
+    def _get_file_text_content(self, document_id: str) -> str:
         content = self._files_resource.export_media(
-            fileId=document.id, mimeType="text/plain"
+            fileId=document_id, mimeType="text/plain"
         ).execute()
-        document.text = self._clean_file_content(content)
-        return document
+        return self._clean_file_content(content)
 
     def _clean_file_content(self, text: bytes) -> str:
         text = strip_whitespace(replace_unicode_quotations(decode_string(text)))
         return text
 
-    def list_users_from_documents(self, files: List[Document]) -> List[Person]:
+    def list_users_from_documents(self, files: List[Document]) -> List[User]:
         user_emails_with_permissions = defaultdict(list)
         for f in files:
             permissions = self.get_file_permissions(f)
@@ -71,7 +76,7 @@ class Scraper:
         users = []
         for email, permissions in user_emails_with_permissions.items():
             users.append(
-                Person.deserialize(
+                User.deserialize(
                     {
                         "email": email,
                         "permissions": [p.serialize() for p in permissions],
@@ -93,7 +98,7 @@ class Scraper:
                     {
                         "id": permission["id"],
                         "role": permission["role"],
-                        "document": file.serialize(),
+                        "document_id": file.id,
                     }
                 ),
             )

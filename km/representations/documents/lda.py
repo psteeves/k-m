@@ -1,5 +1,6 @@
 from typing import List
 
+import numpy as np
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -8,7 +9,7 @@ from km.representations.documents.base import BaseDocRepresentation
 
 
 class LDAModel(BaseDocRepresentation):
-    def __init__(self, n_components, max_df=0.9, min_df=2):
+    def __init__(self, n_components, max_df=0.5, min_df=0.001):
         self._count_vectorizer = CountVectorizer(
             max_df=max_df, min_df=min_df, stop_words="english"
         )
@@ -17,12 +18,12 @@ class LDAModel(BaseDocRepresentation):
         )
 
     def fit(self, documents: List[Document]) -> None:
-        texts = [doc.text for doc in documents]
+        texts = [doc.content for doc in documents]
         term_frequencies = self._count_vectorizer.fit_transform(texts)
         self._lda_model.fit(term_frequencies)
 
-    def transform(self, documents: List[Document]):
-        texts = [doc.text for doc in documents]
+    def transform(self, documents: List[Document]) -> np.array:
+        texts = [doc.content for doc in documents]
         term_frequencies = self._count_vectorizer.transform(texts)
         return self._lda_model.transform(term_frequencies)
 
@@ -31,7 +32,7 @@ class LDAModel(BaseDocRepresentation):
             components = self._lda_model.components_
         except AttributeError:
             raise RuntimeError(
-                "You must train the LDA model before explainint it using .fit()"
+                "You must train the LDA model before explaining it using .fit()"
             )
 
         feature_names = self._count_vectorizer.get_feature_names()
