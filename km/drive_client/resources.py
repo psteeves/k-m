@@ -5,7 +5,7 @@ from googleapiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
 
-from km.data_models import Document, Permission, Person
+from km.data_models import Document, Permission, User
 from km.nlp.text_cleaning import (
     decode_string,
     replace_unicode_quotations,
@@ -61,7 +61,7 @@ class Scraper:
         text = strip_whitespace(replace_unicode_quotations(decode_string(text)))
         return text
 
-    def list_users_from_documents(self, files: List[Document]) -> List[Person]:
+    def list_users_from_documents(self, files: List[Document]) -> List[User]:
         user_emails_with_permissions = defaultdict(list)
         for f in files:
             permissions = self.get_file_permissions(f)
@@ -71,7 +71,7 @@ class Scraper:
         users = []
         for email, permissions in user_emails_with_permissions.items():
             users.append(
-                Person.deserialize(
+                User.deserialize(
                     {
                         "email": email,
                         "permissions": [p.serialize() for p in permissions],

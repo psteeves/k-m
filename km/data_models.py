@@ -7,16 +7,19 @@ import numpy as np
 @dataclasses.dataclass
 class Document:
     id: str
-    name: str
-    text: Optional[str] = None
+    title: str
+    content: str
     representation: Optional[np.array] = None
+    score: Optional[float] = None
 
     @classmethod
     def deserialize(cls, data: Dict[str, str]):
-        text = data.get("text")
-        representation = data.get("representation")
         return cls(
-            id=data["id"], name=data["name"], text=text, representation=representation
+            id=data["id"],
+            title=data["title"],
+            content=data.get("content"),
+            representation=data.get("representation"),
+            score=data.get("score"),
         )
 
     def serialize(self) -> Dict[str, str]:
@@ -25,36 +28,32 @@ class Document:
         )
         return {
             "id": self.id,
-            "name": self.name,
-            "text": self.text,
+            "title": self.title,
+            "content": self.content,
             "representation": representation,
+            "score": self.score,
         }
 
     def __repr__(self):
-        return f"Document(title={self.name})"
+        return f"Document(title={self.title})"
 
 
 @dataclasses.dataclass
 class Permission:
     id: str
     role: str
-    document: Document
+    document_id: str
 
     @classmethod
     def deserialize(cls, data: Dict[str, Any]):
-        return cls(
-            id=data["id"],
-            document=Document.deserialize(data["document"]),
-            role=data["role"],
-        )
+        return cls(id=data["id"], document_id=data["document_id"], role=data["role"])
 
     def serialize(self) -> Dict[str, Any]:
-        document = self.document.serialize()
-        return {"id": self.id, "role": self.role, "document": document}
+        return {"id": self.id, "role": self.role, "document_id": self.document_id}
 
 
 @dataclasses.dataclass
-class Person:
+class User:
     email: str
     permissions: List[Permission]
     representation: Optional[np.array] = None
@@ -71,4 +70,4 @@ class Person:
         return {"email": self.email, "permissions": permissions}
 
     def __repr__(self):
-        return f"Person(email={self.email}, num_permissions={len(self.permissions)})"
+        return f"User(email={self.email}, num_permissions={len(self.permissions)})"
