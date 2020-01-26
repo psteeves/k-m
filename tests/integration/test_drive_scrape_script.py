@@ -1,6 +1,6 @@
 from argparse import Namespace
 
-from scripts.get_files_by_users import run
+from scripts.scrape_drive import run
 
 
 def test_drive_scrape_script(tmpdir):
