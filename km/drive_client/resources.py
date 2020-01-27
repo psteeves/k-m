@@ -1,11 +1,11 @@
 from collections import defaultdict
-from typing import List, Tuple
+from typing import List, Dict
 
 from googleapiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
 
-from km.data_models import Document, Permission, User
+from km.data_models import Document, User
 from km.nlp.text_cleaning import (
     decode_string,
     replace_unicode_quotations,
@@ -16,6 +16,8 @@ SCOPES = "https://www.googleapis.com/auth/drive"
 SUPPORTED_MIMETYPES = [
     "application/vnd.google-apps." + ext for ext in ["document", "presentation"]
 ]
+
+# TODO fix me. Deprecated
 
 
 class Scraper:
@@ -69,7 +71,7 @@ class Scraper:
     def list_users_from_documents(self, files: List[Document]) -> List[User]:
         user_emails_with_permissions = defaultdict(list)
         for f in files:
-            permissions = self.get_file_permissions(f)
+            permissions = self.get_file_contributors(f)
             for email, permission in permissions:
                 user_emails_with_permissions[email].append(permission)
 
@@ -85,22 +87,13 @@ class Scraper:
             )
         return users
 
-    def get_file_permissions(self, file: Document) -> List[Tuple[str, Permission]]:
+    def get_file_contributors(self, file: Document) -> List[Dict]:
         # Make sure we're not saving the document content
         file_permissions = self._permissions_resource.list(
             fileId=file.id, fields="*"
         ).execute()["permissions"]
 
         return [
-            (
-                permission["emailAddress"],
-                Permission.deserialize(
-                    {
-                        "id": permission["id"],
-                        "role": permission["role"],
-                        "document_id": file.id,
-                    }
-                ),
-            )
+            {"email": permission["emailAddress"], "role": permission["role"]}
             for permission in file_permissions
         ]

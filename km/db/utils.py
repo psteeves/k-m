@@ -7,8 +7,7 @@ from km.db.models import Base
 
 @contextmanager
 def session_scope(database_uri: str = "sqlite:///km.sqlite"):
-    engine = create_engine(database_uri)
-    session_factory = orm.scoped_session(orm.sessionmaker(bind=engine))
+    session_factory = create_session_factory(database_uri)
     session = session_factory()
     try:
         yield session
@@ -23,3 +22,8 @@ def session_scope(database_uri: str = "sqlite:///km.sqlite"):
 def create_table(database_uri: str = "sqlite:///km.sqlite"):
     engine = create_engine(database_uri)
     Base.metadata.create_all(engine)
+
+
+def create_session_factory(database_uri):
+    engine = create_engine(database_uri)
+    return orm.scoped_session(orm.sessionmaker(bind=engine))

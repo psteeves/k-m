@@ -53,7 +53,7 @@ def get_files(path: Path, uri: str) -> None:
             session.add(user_model)
 
         session.commit()
-        logger.info("Added users and files to the DB")
+        logger.info(f"Added users and files to the DB `{args.database_uri}`")
 
 
 def run(args):

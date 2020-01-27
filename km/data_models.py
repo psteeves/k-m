@@ -6,68 +6,49 @@ import numpy as np
 
 @dataclasses.dataclass
 class Document:
-    id: str
+    id: int
     title: str
     content: str
     representation: Optional[np.array] = None
     score: Optional[float] = None
 
     @classmethod
-    def deserialize(cls, data: Dict[str, str]):
+    def deserialize(cls, data: Dict[str, Any]):
         return cls(
             id=data["id"],
             title=data["title"],
-            content=data.get("content"),
+            content=data["content"],
             representation=data.get("representation"),
             score=data.get("score"),
         )
 
-    def serialize(self) -> Dict[str, str]:
-        representation = (
-            self.representation.tolist() if self.representation is not None else None
-        )
-        return {
-            "id": self.id,
-            "title": self.title,
-            "content": self.content,
-            "representation": representation,
-            "score": self.score,
-        }
+    @classmethod
+    def from_db_model(cls, db_model):
+        state = db_model.__dict__
+        state.pop("_sa_instance_state")
+        return cls.deserialize(state)
 
     def __repr__(self):
         return f"Document(title={self.title})"
 
 
 @dataclasses.dataclass
-class Permission:
-    id: str
-    role: str
-    document_id: str
-
-    @classmethod
-    def deserialize(cls, data: Dict[str, Any]):
-        return cls(id=data["id"], document_id=data["document_id"], role=data["role"])
-
-    def serialize(self) -> Dict[str, Any]:
-        return {"id": self.id, "role": self.role, "document_id": self.document_id}
-
-
-@dataclasses.dataclass
 class User:
+    id: int
     email: str
-    permissions: List[Permission]
+    documents: List[Document]
     representation: Optional[np.array] = None
+    score: Optional[float] = None
+
+    @classmethod
+    def from_db_model(cls, db_model):
+        documents = [Document.from_db_model(doc) for doc in db_model.documents]
+        return cls(id=db_model.id, email=db_model.email, documents=documents)
 
     @classmethod
     def deserialize(cls, data: Dict[str, Any]):
-        return cls(
-            email=data["email"],
-            permissions=[Permission.deserialize(p) for p in data["permissions"]],
-        )
-
-    def serialize(self) -> Dict[str, Any]:
-        permissions = [p.serialize() for p in self.permissions]
-        return {"email": self.email, "permissions": permissions}
+        documents = [Document.deserialize(doc) for doc in data["documents"]]
+        return cls(id=data["id"], email=data["email"], documents=documents)
 
     def __repr__(self):
-        return f"User(email={self.email}, num_permissions={len(self.permissions)})"
+        return f"User(email={self.email}, num_documents={len(self.documents)})"

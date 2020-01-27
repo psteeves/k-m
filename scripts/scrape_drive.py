@@ -8,6 +8,9 @@ from km.drive_client.resources import Scraper
 logger = get_logger()
 
 
+# TODO fix me! Script is deprecated
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
