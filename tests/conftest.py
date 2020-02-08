@@ -5,7 +5,8 @@ import pytest
 
 from km.data_models import Document
 from km.representations.documents.lda import LDAModel
-from km.representations.people.aggregators import DocumentAggregator
+from km.orchestrator.orchestrator import Orchestrator
+
 
 _FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
@@ -32,5 +33,5 @@ def doc_model():
 
 
 @pytest.fixture
-def people_model(doc_model):
-    return DocumentAggregator(doc_model)
+def orchestrator():
+    return Orchestrator()

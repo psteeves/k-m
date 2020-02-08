@@ -2,6 +2,7 @@
 **/__pycache__
 **/.ipynb_checkpoints
 
+.mypy_cache/
 .nltk-data
 client_id.json
 storage.json
