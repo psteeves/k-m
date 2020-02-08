@@ -1,6 +1,5 @@
 from typing import List
 
-import numpy as np
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -22,10 +21,13 @@ class LDAModel(BaseDocRepresentation):
         term_frequencies = self._count_vectorizer.fit_transform(texts)
         self._lda_model.fit(term_frequencies)
 
-    def transform(self, documents: List[Document]) -> np.array:
+    def transform(self, documents: List[Document]) -> List[Document]:
         texts = [doc.content for doc in documents]
         term_frequencies = self._count_vectorizer.transform(texts)
-        return self._lda_model.transform(term_frequencies)
+        representations = self._lda_model.transform(term_frequencies)
+        for i, doc in enumerate(documents):
+            doc.representation = representations[i]
+        return documents
 
     def explain(self):
         try:
