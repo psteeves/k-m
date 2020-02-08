@@ -1,6 +1,7 @@
+from typing import Optional
+
 from km.db.models import Document, User
 from km.db.utils import create_session_factory
-from typing import Optional
 
 
 class DB:

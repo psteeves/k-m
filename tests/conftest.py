@@ -4,9 +4,8 @@ from pathlib import Path
 import pytest
 
 from km.data_models import Document
-from km.representations.documents.lda import LDAModel
 from km.orchestrator.orchestrator import Orchestrator
-
+from km.representations.documents.lda import LDAModel
 
 _FIXTURES_DIR = Path(__file__).parent / "fixtures"
 

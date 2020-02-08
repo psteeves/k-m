@@ -11,7 +11,6 @@ from km.representations.documents.base import BaseDocRepresentation
 from km.representations.documents.lda import LDAModel
 from km.utils import make_document
 
-
 logger = structlog.get_logger(__name__)
 
 
