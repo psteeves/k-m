@@ -1,11 +1,10 @@
-import json
 from pathlib import Path
 
 import pytest
 
-from km.data_models import Document
 from km.orchestrator.orchestrator import Orchestrator
 from km.representations.documents.lda import LDAModel
+from km.representations.users.topic_aggregator import TopicAggregator
 
 _FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
@@ -16,21 +15,40 @@ def data_path():
 
 
 @pytest.fixture
-def documents(data_path):
-    documents_path = data_path / "documents"
-    documents = []
-    for doc_path in documents_path.iterdir():
-        doc_dict = {"id": doc_path.stem}
-        doc_dict.update(json.load(open(doc_path)))
-        documents.append(doc_dict)
-    return [Document.deserialize(d) for d in documents]
+def doc_model():
+    return LDAModel(3)
 
 
 @pytest.fixture
-def doc_model():
-    return LDAModel(4)
+def user_model():
+    return TopicAggregator()
 
 
 @pytest.fixture
 def orchestrator():
-    return Orchestrator()
+    return Orchestrator(db_uri="sqlite:///test-data.sqlite")
+
+
+@pytest.fixture
+def documents(orchestrator):
+    return orchestrator._get_documents()
+
+
+@pytest.fixture
+def users(orchestrator):
+    return orchestrator._get_users()
+
+
+@pytest.fixture
+def business_user(users):
+    return [u for u in users if u.email.startswith("business")][0]
+
+
+@pytest.fixture
+def bio_user(users):
+    return [u for u in users if u.email.startswith("bio")][0]
+
+
+@pytest.fixture
+def generalist_user(users):
+    return [u for u in users if u.email.startswith("generalist")][0]

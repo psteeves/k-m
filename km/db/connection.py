@@ -20,5 +20,8 @@ class DB:
             query = query.limit(num_docs)
         return query.all()
 
-    def get_users(self):
-        return self.session.query(User).all()
+    def get_users(self, num_users: Optional[int] = None):
+        query = self.session.query(User)
+        if num_users:
+            query = query.limit(num_users)
+        return query.all()
