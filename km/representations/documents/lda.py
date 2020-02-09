@@ -40,7 +40,7 @@ class LDAModel(BaseDocRepresentation):
         feature_names = self._count_vectorizer.get_feature_names()
 
         topics = {
-            i: {feature_names[word]: topic[word] for word in topic.argsort()[:-11:-1]}
+            i: {feature_names[word]: round(topic[word], 2) for word in topic.argsort()[:-11:-1]}
             for i, topic in enumerate(components)
         }
         return topics

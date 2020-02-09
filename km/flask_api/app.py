@@ -16,7 +16,7 @@ def create_app():
     app.config.from_object(config)
     app.register_blueprint(api, url_prefix=_API_PREFIX)
     _register_orchestrator(app)
-    app.orchestrator.fit()
+
     CORS(app)
     return app
 
@@ -24,6 +24,7 @@ def create_app():
 def _register_orchestrator(app):
     db_uri = app.config["DATABASE_URI"]
     orchestrator = Orchestrator(db_uri=db_uri)
+    orchestrator.load_model(app.config["SERIALIZED_MODEL_DIR"] + "/lda_model.pkl")
     app.orchestrator = orchestrator
 
 

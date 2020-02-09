@@ -41,3 +41,9 @@ def query_users():
     results = ork.query_users(str(query), limit)
     results = [user.serialize() for user in results]
     return jsonify(results)
+
+
+@api.route("/topics", methods=["GET"])
+def topics():
+    ork = current_app.orchestrator
+    return ork.get_topics()

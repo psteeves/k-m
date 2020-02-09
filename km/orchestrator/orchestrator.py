@@ -53,6 +53,9 @@ class Orchestrator:
         self._document_model.fit(documents)
         return self._document_model
 
+    def get_topics(self):
+        return self._document_model.explain()
+
     def serialize_model(self, path: str) -> None:
         pickle.dump(self._document_model, open(path, "wb"))
         logger.info(f"Serialized document model to {path}")
