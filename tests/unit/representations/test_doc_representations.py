@@ -3,15 +3,12 @@ import numpy as np
 
 def test_doc_representations(doc_model, documents):
     doc_model.fit(documents)
-    representations = doc_model.transform(documents)
+    transformed_docs = doc_model.transform(documents)
 
-    assert len(representations) == len(documents)
+    assert len(transformed_docs) == len(documents)
 
-    # Check topics sum to 1
-    np.testing.assert_allclose(
-        representations.sum(axis=1), np.ones((len(representations)))
-    )
-
-    # All documents are very topic-specific, so the representations should have high variance
-    for rep in representations:
-        assert np.std(rep) > 0.4
+    for doc in transformed_docs:
+        # Check topics sum to 1
+        np.testing.assert_almost_equal(doc.representation.sum(), 1)
+        # All documents are very topic-specific, so the transformed_docs should have high variance
+        assert np.std(doc.representation) > 0.4

@@ -1,5 +1,7 @@
 import dataclasses
 from typing import Any, Dict, List, Optional
+from km.db.models import User as DbUser
+from km.db.models import Document as DbDocument
 
 import numpy as np
 
@@ -13,7 +15,7 @@ class Document:
     score: Optional[float] = None
 
     @classmethod
-    def deserialize(cls, data: Dict[str, Any]):
+    def deserialize(cls, data: Dict[str, Any]) -> "Document":
         return cls(
             id=data["id"],
             title=data["title"],
@@ -23,10 +25,8 @@ class Document:
         )
 
     @classmethod
-    def from_db_model(cls, db_model):
-        state = db_model.__dict__
-        state.pop("_sa_instance_state")
-        return cls.deserialize(state)
+    def from_db_model(cls, db_model: DbDocument) -> "Document":
+        return cls(id=db_model.id, title=db_model.title, content=db_model.content)
 
     def __repr__(self):
         return f"Document(title={self.title})"
@@ -41,12 +41,11 @@ class User:
     score: Optional[float] = None
 
     @classmethod
-    def from_db_model(cls, db_model):
-        documents = [Document.from_db_model(doc) for doc in db_model.documents]
-        return cls(id=db_model.id, email=db_model.email, documents=documents)
+    def from_db_model(cls, db_model: DbUser) -> "User":
+        return cls(id=db_model.id, email=db_model.email, documents=[Document.from_db_model(doc) for doc in db_model.documents])
 
     @classmethod
-    def deserialize(cls, data: Dict[str, Any]):
+    def deserialize(cls, data: Dict[str, Any]) -> "User":
         documents = [Document.deserialize(doc) for doc in data["documents"]]
         return cls(id=data["id"], email=data["email"], documents=documents)
 

@@ -39,12 +39,12 @@ class Orchestrator:
 
         self.db = DB(db_uri)
 
-    def _get_documents(self, num_docs: int = None):
+    def _get_documents(self, num_docs: Optional[int] = None):
         db_docs = self.db.get_documents(num_docs)
         return [Document.from_db_model(doc) for doc in db_docs]
 
-    def _get_users(self):
-        db_users = self.db.get_users()
+    def _get_users(self, num_users: Optional[int] = None):
+        db_users = self.db.get_users(num_users)
         return [User.from_db_model(user) for user in db_users]
 
     def fit(self, max_docs: int = None) -> BaseDocRepresentation:

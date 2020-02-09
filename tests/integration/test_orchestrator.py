@@ -1,3 +1,6 @@
+from km.data_models import User
+
+
 def test_orchestrator(orchestrator):
 
     orchestrator.fit(max_docs=10)
@@ -5,12 +8,9 @@ def test_orchestrator(orchestrator):
     bio_query = "Research into diseases of the gut and and breast"
 
     top_docs = orchestrator.query_documents(bio_query)
-    assert len(top_docs) == 10
+    assert len(top_docs) == 8
 
-    # Disabled until user model refactor
-    # top_person = orchestrator.query_people(bio_query)[0][0]
-    # assert top_person.email == "bio_person@bla.com"
-    #
-    # other_query = "Space astronaut food nutrients sports goal politics"
-    # top_person = orchestrator.query_people(other_query)[0][0]
-    # assert top_person.email == "generalist@bla.com"
+    # TODO test models work
+    top_person = orchestrator.query_users(bio_query)[0]
+    assert isinstance(top_person, User)
+

@@ -29,6 +29,8 @@ def _parse_args():
 
 
 def get_files(path: Path, uri: str) -> None:
+    if Path(uri.split("/")[-1]).exists():
+        raise RuntimeError("DB already exists.")
     create_table(uri)
     with session_scope(uri) as session:
         documents_dir = path / "documents"
