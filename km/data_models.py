@@ -14,6 +14,13 @@ class Document:
     representation: Optional[np.array] = None
     score: Optional[float] = None
 
+    def serialize(self, keep_content=False):
+        state = dataclasses.asdict(self)
+        state.pop("representation")
+        if not keep_content:
+            state.pop("content")
+        return state
+
     @classmethod
     def deserialize(cls, data: Dict[str, Any]) -> "Document":
         return cls(
@@ -39,6 +46,15 @@ class User:
     documents: List[Document]
     representation: Optional[np.array] = None
     score: Optional[float] = None
+
+    def serialize(self, keep_content=False):
+        state = dataclasses.asdict(self)
+        state.pop("representation")
+        for doc in state["documents"]:
+            doc.pop("representation")
+            if not keep_content:
+                doc.pop("content")
+        return state
 
     @classmethod
     def from_db_model(cls, db_model: DbUser) -> "User":
