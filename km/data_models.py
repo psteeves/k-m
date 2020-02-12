@@ -1,4 +1,5 @@
 import dataclasses
+import random
 from typing import Any, Dict, List, Optional
 
 import numpy as np
@@ -17,6 +18,7 @@ class Document:
 
     def serialize(self, keep_content=False):
         state = dataclasses.asdict(self)
+        state.pop("representation")
         if not keep_content:
             state.pop("content")
         return state
@@ -56,9 +58,14 @@ class User:
     representation: Optional[np.array] = None
     score: Optional[float] = None
 
-    def serialize(self, keep_content=False):
+    def serialize(self, keep_content: bool = False, num_docs: Optional[int] = 10):
         state = dataclasses.asdict(self)
+        state.pop("representation")
+        if num_docs is not None:
+            if len(state["documents"]) >= num_docs:
+                state["documents"] = random.sample(state["documents"], num_docs)
         for doc in state["documents"]:
+            doc.pop("representation")
             if not keep_content:
                 doc.pop("content")
         return state

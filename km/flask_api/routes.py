@@ -19,7 +19,7 @@ def docs():
 def query_docs():
     ork = current_app.orchestrator
     query = request.args.get("query")
-    limit = request.args.get("limit")
+    limit = request.args.get("limit", 10)
     if not query:
         raise ValueError(f"You must provide a non-empty query. Got `{query}`")
 
