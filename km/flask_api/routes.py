@@ -1,6 +1,4 @@
-from flask import Blueprint, request, jsonify
-from flask import current_app
-
+from flask import Blueprint, current_app, jsonify, request
 
 api = Blueprint("api", __name__)
 
@@ -21,7 +19,7 @@ def docs():
 def query_docs():
     ork = current_app.orchestrator
     query = request.args.get("query")
-    limit = request.args.get("limit")
+    limit = request.args.get("limit", 10)
     if not query:
         raise ValueError(f"You must provide a non-empty query. Got `{query}`")
 
@@ -41,3 +39,9 @@ def query_users():
     results = ork.query_users(str(query), limit)
     results = [user.serialize() for user in results]
     return jsonify(results)
+
+
+@api.route("/topics", methods=["GET"])
+def topics():
+    ork = current_app.orchestrator
+    return ork.get_topics()

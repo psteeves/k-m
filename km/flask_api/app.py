@@ -1,7 +1,8 @@
 from flask import Flask
-from structlog import get_logger
-from km.flask_api.config import Config
 from flask_cors import CORS
+from structlog import get_logger
+
+from km.flask_api.config import Config
 from km.flask_api.routes import api
 from km.orchestrator.orchestrator import Orchestrator
 
@@ -16,7 +17,7 @@ def create_app():
     app.config.from_object(config)
     app.register_blueprint(api, url_prefix=_API_PREFIX)
     _register_orchestrator(app)
-    app.orchestrator.fit()
+
     CORS(app)
     return app
 
@@ -24,6 +25,7 @@ def create_app():
 def _register_orchestrator(app):
     db_uri = app.config["DATABASE_URI"]
     orchestrator = Orchestrator(db_uri=db_uri)
+    orchestrator.load_model(app.config["SERIALIZED_MODEL_DIR"] + "/lda_model.pkl")
     app.orchestrator = orchestrator
 
 

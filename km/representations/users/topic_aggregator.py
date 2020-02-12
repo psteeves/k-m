@@ -1,8 +1,8 @@
-from typing import List, Callable, Optional
+from typing import Callable, List, Optional
 
 import numpy as np
 
-from km.data_models import User, Document
+from km.data_models import Document, User
 from km.representations.users.base import BaseUserRepresentation
 
 
@@ -16,7 +16,9 @@ def _default_aggregator(input_: List[np.array]):
 
 
 class TopicAggregator(BaseUserRepresentation):
-    def __init__(self, aggregator: Optional[Callable[[List[np.array]], np.array]] = None):
+    def __init__(
+        self, aggregator: Optional[Callable[[List[np.array]], np.array]] = None
+    ):
         if aggregator is None:
             aggregator = _default_aggregator
         self.aggregator = aggregator
@@ -28,7 +30,9 @@ class TopicAggregator(BaseUserRepresentation):
         for user in users:
             for doc in user.documents:
                 if doc.representation is None:
-                    raise RuntimeError("You must compute document representations before computing user representations")
+                    raise RuntimeError(
+                        "You must compute document representations before computing user representations"
+                    )
 
             representation = self._aggregate_doc_representations(user.documents)
             user.representation = representation

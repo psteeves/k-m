@@ -13,4 +13,3 @@ def test_orchestrator(orchestrator):
     # TODO test models work
     top_person = orchestrator.query_users(bio_query)[0]
     assert isinstance(top_person, User)
-
