@@ -8,9 +8,9 @@ from km.data_models import Document, User
 from km.db.connection import DB
 from km.metrics.similarity import EuclidianSimilarity
 from km.representations.documents.base import BaseDocRepresentation
+from km.representations.documents.lda import LDAModel
 from km.representations.users.base import BaseUserRepresentation
 from km.representations.users.topic_aggregator import TopicAggregator
-from km.representations.documents.lda import LDAModel
 from km.utils import make_document
 
 logger = structlog.get_logger(__name__)
@@ -73,11 +73,12 @@ class Orchestrator:
         transformed_query = self.describe_documents([query_doc])[0]
 
         documents = self._get_documents()
-        transformed_documents = self.describe_documents(documents)
 
         scores = [
-            self._similarity_measure(doc.representation, transformed_query.representation)
-            for doc in transformed_documents
+            self._similarity_measure(
+                doc.representation, transformed_query.representation
+            )
+            for doc in documents
         ]
         for i, doc in enumerate(documents):
             doc.score = scores[i]
@@ -85,10 +86,6 @@ class Orchestrator:
         return sorted_documents[:max_docs]
 
     def describe_users(self, users: List[User]) -> np.array:
-        # Compute representations for documents
-        for user in users:
-            self.describe_documents(user.documents)
-
         return self._user_model.transform(users)
 
     def query_users(self, query: str, max_users: int = 10) -> List[User]:
@@ -99,7 +96,9 @@ class Orchestrator:
         transformed_users = self.describe_users(users)
 
         scores = [
-            self._similarity_measure(user.representation, transformed_query.representation)
+            self._similarity_measure(
+                user.representation, transformed_query.representation
+            )
             for user in transformed_users
         ]
         for i, user in enumerate(users):

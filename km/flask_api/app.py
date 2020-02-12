@@ -1,7 +1,8 @@
 from flask import Flask
-from structlog import get_logger
-from km.flask_api.config import Config
 from flask_cors import CORS
+from structlog import get_logger
+
+from km.flask_api.config import Config
 from km.flask_api.routes import api
 from km.orchestrator.orchestrator import Orchestrator
 

@@ -17,6 +17,7 @@ mypy = "^0.761.0"
 pylama = "^7.7"
 flask = "^1.1"
 flask-cors = "^3.0"
+tqdm = "^4.42"
 
 [tool.poetry.dev-dependencies]
 

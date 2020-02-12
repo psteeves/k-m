@@ -1,7 +1,9 @@
 import numpy as np
 
 
-def test_document_aggregator(user_model, doc_model, bio_user, generalist_user, documents):
+def test_document_aggregator(
+    user_model, doc_model, bio_user, generalist_user, documents
+):
     doc_model.fit(documents)
     doc_model.transform(bio_user.documents)
     doc_model.transform(generalist_user.documents)

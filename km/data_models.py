@@ -1,9 +1,10 @@
 import dataclasses
 from typing import Any, Dict, List, Optional
-from km.db.models import User as DbUser
-from km.db.models import Document as DbDocument
 
 import numpy as np
+
+from km.db.models import Document as DbDocument
+from km.db.models import User as DbUser
 
 
 @dataclasses.dataclass
@@ -16,7 +17,6 @@ class Document:
 
     def serialize(self, keep_content=False):
         state = dataclasses.asdict(self)
-        state.pop("representation")
         if not keep_content:
             state.pop("content")
         return state
@@ -33,10 +33,19 @@ class Document:
 
     @classmethod
     def from_db_model(cls, db_model: DbDocument) -> "Document":
-        return cls(id=db_model.id, title=db_model.title, content=db_model.content)
+        return cls(
+            id=db_model.id,
+            title=db_model.title,
+            content=db_model.content,
+            representation=db_model.representation,
+        )
 
     def __repr__(self):
         return f"Document(title={self.title})"
+
+
+def _create_empty_representation():
+    return np.array([])
 
 
 @dataclasses.dataclass
@@ -49,16 +58,19 @@ class User:
 
     def serialize(self, keep_content=False):
         state = dataclasses.asdict(self)
-        state.pop("representation")
         for doc in state["documents"]:
-            doc.pop("representation")
             if not keep_content:
                 doc.pop("content")
         return state
 
     @classmethod
     def from_db_model(cls, db_model: DbUser) -> "User":
-        return cls(id=db_model.id, email=db_model.email, documents=[Document.from_db_model(doc) for doc in db_model.documents])
+        return cls(
+            id=db_model.id,
+            email=db_model.email,
+            documents=[Document.from_db_model(doc) for doc in db_model.documents],
+            representation=db_model.representation,
+        )
 
     @classmethod
     def deserialize(cls, data: Dict[str, Any]) -> "User":

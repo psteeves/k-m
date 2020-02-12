@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Table
+from sqlalchemy import Column, ForeignKey, Integer, PickleType, String, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -18,6 +18,7 @@ class Document(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String, nullable=False)
     content = Column(String, nullable=False)
+    representation = Column(PickleType, nullable=True)
 
 
 class User(Base):
@@ -25,3 +26,4 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     email = Column(String)
     documents = relationship("Document", secondary=user_documents, backref="users")
+    representation = Column(PickleType, nullable=True)
