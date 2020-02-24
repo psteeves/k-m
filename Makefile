@@ -1,5 +1,7 @@
+SOURCE_DIRECTORIES= km scripts tests
+
 format: 
-	poetry run isort -y
+	poetry run isort -y -rc $(SOURCE_DIRECTORIES)
 	poetry run black .
 
 test:
