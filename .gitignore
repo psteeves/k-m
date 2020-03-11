@@ -4,7 +4,3 @@
 
 .mypy_cache/
 .nltk-data
-client_id.json
-storage.json
-poetry.lock
-
