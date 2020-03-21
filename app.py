@@ -50,9 +50,7 @@ def run_app():
         "Select a file.", ["<Select>"] + list(files.keys())
     )
 
-    if file_selection == "<Select>":
-        images = []
-    else:
+    if file_selection != "<Select>":
         file_path = files[file_selection]
         images = convert_from_path(file_path, dpi=200)
         with open(file_path.with_suffix(".txt"), "r") as f:
@@ -71,7 +69,24 @@ def run_app():
             for i, score in enumerate(document_topic_scores)
         }
         pie_chart = document_topics_pie(document_topics)
+
+        st.header("Document topics")
         st.write(pie_chart)
+
+        st.header("What would you like to search for within your organization?")
+        st.write(
+            "<style>div.Widget.row-widget.stRadio > div{flex-direction:row;}</style>",
+            unsafe_allow_html=True,
+        )
+        search = st.radio(label="", options=["Find documents", "Find experts"])
+
+        if search == "Find documents":
+            search_results = ork.query_documents(query=doc.content, max_docs=3)
+
+        else:
+            search_results = ork.query_users(query=doc.content, max_users=3)
+
+        st.write(search_results)
 
 
 if __name__ == "__main__":
