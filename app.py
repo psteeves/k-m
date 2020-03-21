@@ -32,7 +32,7 @@ def _inject_sidebar_css():
 
 def _init_orchestrator():
     orchestrator = Orchestrator(db_uri=_DB_URI)
-    orchestrator.load_model(_SERIALIZED_MODEL_DIR + "lda_model.pkl")
+    orchestrator.load_model(_SERIALIZED_MODEL_DIR + "lda_model_50.pkl")
     return orchestrator
 
 

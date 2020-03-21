@@ -33,7 +33,7 @@ def main():
     orchestrator = Orchestrator(document_model=topic_model)
 
     orchestrator.fit()
-    model_path = args.serialized_model_dir / args.model_name
+    model_path = (args.serialized_model_dir / args.model_name).with_suffix(".pkl")
     orchestrator.serialize_model(model_path)
 
 
