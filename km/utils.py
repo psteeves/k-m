@@ -3,8 +3,8 @@ from typing import List
 from km.data_models import Document, User
 
 
-def make_document(id_: int = 0, content: str = "") -> Document:
-    return Document(id=id_, title="", content=content)
+def make_document(id_: int = 0, title: str = "", content: str = "") -> Document:
+    return Document(id=id_, title=title, content=content)
 
 
 def make_user(texts: List[str]) -> User:
