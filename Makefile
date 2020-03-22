@@ -1,4 +1,4 @@
-SOURCE_DIRECTORIES= km scripts tests app.py graphing.py constants.py
+SOURCE_DIRECTORIES= km scripts tests streamlit_app app.py
 
 format: 
 	poetry run isort -y -rc $(SOURCE_DIRECTORIES)
