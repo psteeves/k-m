@@ -46,10 +46,6 @@ class Document:
         return f"Document(title={self.title})"
 
 
-def _create_empty_representation():
-    return np.array([])
-
-
 @dataclasses.dataclass
 class User:
     id: int

@@ -19,7 +19,7 @@ logger = structlog.get_logger(__name__)
 class Orchestrator:
     def __init__(
         self,
-        db_uri: str = "sqlite:///km.sqlite",
+        db_uri: str,
         document_model: Optional[BaseDocRepresentation] = None,
         user_model: Optional[BaseUserRepresentation] = None,
         similarity_measure=None,
