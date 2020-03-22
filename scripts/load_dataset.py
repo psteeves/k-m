@@ -37,7 +37,7 @@ def _parse_args():
     parser.add_argument(
         "-m",
         "--serialized-model",
-        default="serialized_models/lda_model_50.pkl",
+        required=True,
         help="Path to serialized model to use",
     )
     return parser.parse_args()
