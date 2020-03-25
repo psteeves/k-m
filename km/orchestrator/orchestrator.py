@@ -68,11 +68,14 @@ class Orchestrator:
     def describe_documents(self, documents: List[Document]) -> np.array:
         return self._document_model.transform(documents)
 
-    def query_documents(self, query: str, max_docs: int = 10) -> List[Document]:
+    def query_documents(
+        self, query: str, documents=None, max_docs: int = 5
+    ) -> List[Document]:
         query_doc = make_document(content=query)
         transformed_query = self.describe_documents([query_doc])[0]
 
-        documents = self._get_documents()
+        if documents is None:
+            documents = self._get_documents()
 
         scores = [
             self._similarity_measure(
@@ -88,7 +91,9 @@ class Orchestrator:
     def describe_users(self, users: List[User]) -> np.array:
         return self._user_model.transform(users)
 
-    def query_users(self, query: str, max_users: int = 10) -> List[User]:
+    def query_users(
+        self, query: str, filter_user_documents=True, max_users: int = 5
+    ) -> List[User]:
         query_doc = make_document(content=query)
         transformed_query = self.describe_documents([query_doc])[0]
 
@@ -104,4 +109,10 @@ class Orchestrator:
         for i, user in enumerate(users):
             user.score = scores[i]
         sorted_users = sorted(users, key=lambda u: u.score)
-        return sorted_users[:max_users]
+        sorted_users = sorted_users[:max_users]
+
+        if filter_user_documents:
+            for user in sorted_users:
+                user.documents = self.query_documents(query, documents=user.documents)
+
+        return sorted_users

@@ -6,7 +6,7 @@ def inject_sidebar_css():
         """
                         <style>
                         .sidebar-content {
-                            width: 40rem ! important;
+                            width: 58rem ! important;
                         }
                         </style>
                         """,
@@ -43,3 +43,20 @@ def inject_radio_button_css():
 
 def insert_blank_lines(n=2):
     st.markdown("<br>" * n, unsafe_allow_html=True)
+
+
+def display_user_results(results):
+    for user_email, document_titles in results.items():
+        if st.button(user_email):
+            st.markdown("**Authored:**")
+            for title in document_titles:
+                st.markdown(f"- {title}")
+            insert_blank_lines(n=2)
+
+
+def display_document_results(results):
+    for document_title, content in results.items():
+        if st.button(document_title):
+            st.markdown("**Content:**")
+            st.text_area(label="", value=content)
+            insert_blank_lines(n=2)
