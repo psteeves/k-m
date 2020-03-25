@@ -2,13 +2,14 @@ from pathlib import Path
 
 import streamlit as st
 
+from constants import DB_URI, DEFAULT_MODEL, SERIALIZED_MODEL_DIR
 from km.orchestrator.orchestrator import Orchestrator
 from km.utils import make_document
-
-from constants import DB_URI, DEFAULT_MODEL, SERIALIZED_MODEL_DIR
 from streamlit_app.graphing import document_topics_pie
 from streamlit_app.modeling import describe_doc, search
 from streamlit_app.styling import (
+    display_document_results,
+    display_user_results,
     format_file_names,
     inject_radio_button_css,
     inject_sidebar_css,
@@ -39,9 +40,7 @@ def run_app():
 
     # Sidebar
     inject_sidebar_css()
-    file_selection = st.sidebar.selectbox(
-        "Select a file.", ["<Select>"] + filenames
-    )
+    file_selection = st.sidebar.selectbox("Select a file.", ["<Select>"] + filenames)
 
     if file_selection != "<Select>":
         file_path = files[file_selection]
@@ -51,23 +50,30 @@ def run_app():
 
         ork = _init_orchestrator()
 
-        st.header("Document topics")
+        st.header("Document topic analysis")
         document_topics = describe_doc(ork, doc)
+        st.markdown(
+            f"The document is mostly made up of **{len(document_topics)}** topics."
+        )
         pie_chart = document_topics_pie(document_topics)
         st.write(pie_chart)
 
-        st.header("What do you want to search for?")
+        st.header("Relevant internal expertise.")
+        st.markdown(
+            "Using our patented technology, we can quickly identify experts with the requisite expertise should"
+            " you wish to discuss this material with them. You can also directly search for similar documents."
+        )
         inject_radio_button_css()
 
-        search_method = st.radio(label="", options=["Find documents", "Find experts"])
-        search_method = search_method.split()[1]
-        search_results = search(ork, doc.content, search_method)
+        search_method = st.radio(label="", options=["Experts", "Documents"])
+        search_results = search(ork, doc.content, search_method.lower())
         insert_blank_lines(n=2)
 
         inject_textarea_css()
-        for title, content in search_results.items():
-            if st.button(title):
-                st.text_area(label="", value=content)
+        if search_method == "Experts":
+            display_user_results(search_results)
+        else:
+            display_document_results(search_results)
 
 
 if __name__ == "__main__":
