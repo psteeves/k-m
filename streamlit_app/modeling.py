@@ -20,7 +20,7 @@ def search(orchestrator: Orchestrator, query: str, query_method: str):
         search_results = orchestrator.query_documents(query)
         search_display = _format_document_search_results(search_results)
     else:
-        search_results = orchestrator.query_users(query)
+        search_results = orchestrator.query_users(query, max_users=2)
         search_display = _format_user_search_results(search_results)
     return search_display
 

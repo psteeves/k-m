@@ -7,8 +7,10 @@ import tqdm
 from structlog import get_logger
 
 from km.data_models import Document as SimpleDocument
+from km.data_models import User as SimpleUser
 from km.db.models import Document, User
 from km.db.utils import create_table, session_scope
+from km.representations.users.topic_concatenator import TopicConcatenator
 
 logger = get_logger(__file__)
 
@@ -48,7 +50,9 @@ def get_files(path: Path, uri: str) -> None:
         raise RuntimeError("DB already exists.")
     create_table(uri)
     if not args.skip_representation:
-        model = pickle.load(open(args.serialized_model, "rb"))
+        document_representation_model = pickle.load(open(args.serialized_model, "rb"))
+        user_representation_model = TopicConcatenator()
+
     with session_scope(uri) as session:
         documents_dir = path / "documents"
         user_labels_path = path / "user_labels.json"
@@ -61,7 +65,9 @@ def get_files(path: Path, uri: str) -> None:
             doc_model = Document(id=doc_id, title=doc["title"], content=doc["content"])
             if not args.skip_representation:
                 simple_document = SimpleDocument.from_db_model(doc_model)
-                representation = model([simple_document])[0].representation
+                representation = document_representation_model([simple_document])[
+                    0
+                ].representation
                 doc_model.representation = representation
             session.add(doc_model)
             docs[doc_id] = doc_model
@@ -73,6 +79,10 @@ def get_files(path: Path, uri: str) -> None:
             for doc_id in info["document_ids"]:
                 doc = docs[int(doc_id)]
                 user_model.documents.append(doc)
+            if not args.skip_representation:
+                user_model.representation = user_representation_model(
+                    [SimpleUser.from_db_model(user_model)]
+                )[0].representation
             session.add(user_model)
 
         session.commit()

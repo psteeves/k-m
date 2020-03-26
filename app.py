@@ -46,7 +46,8 @@ def run_app():
         file_path = files[file_selection]
         images, file_content = load_document(file_path)
         doc = make_document(id_=filenames.index(file_selection), content=file_content)
-        st.sidebar.image(images, width=600)
+        insert_blank_lines(sidebar=True)
+        st.sidebar.image(images, width=690)
 
         ork = _init_orchestrator()
 
@@ -67,7 +68,7 @@ def run_app():
 
         search_method = st.radio(label="", options=["Experts", "Documents"])
         search_results = search(ork, doc.content, search_method.lower())
-        insert_blank_lines(n=2)
+        insert_blank_lines(n=1)
 
         inject_textarea_css()
         if search_method == "Experts":
