@@ -6,11 +6,12 @@ import structlog
 
 from km.data_models import Document, User
 from km.db.connection import DB
-from km.metrics.similarity import EuclidianSimilarity
 from km.representations.documents.base import BaseDocRepresentation
 from km.representations.documents.lda import LDAModel
 from km.representations.users.base import BaseUserRepresentation
-from km.representations.users.topic_aggregator import TopicAggregator
+from km.representations.users.topic_concatenator import TopicConcatenator
+from km.scorers.document_scorers import EuclidianSimilarityScorer
+from km.scorers.user_scorers import ExponentiallyWeightedDocSimilarity
 from km.utils import make_document
 
 logger = structlog.get_logger(__name__)
@@ -22,20 +23,27 @@ class Orchestrator:
         db_uri: str,
         document_model: Optional[BaseDocRepresentation] = None,
         user_model: Optional[BaseUserRepresentation] = None,
-        similarity_measure=None,
+        document_scorer=None,
+        user_scorer=None,
     ):
         if document_model is None:
             document_model = LDAModel(n_components=25)
 
         if user_model is None:
-            user_model = TopicAggregator()
+            user_model = TopicConcatenator()
 
-        if similarity_measure is None:
-            similarity_measure = EuclidianSimilarity()
+        if document_scorer is None:
+            document_scorer = EuclidianSimilarityScorer()
+
+        if user_scorer is None:
+            user_scorer = ExponentiallyWeightedDocSimilarity(
+                similarity_measure=document_scorer
+            )
 
         self._document_model = document_model
         self._user_model = user_model
-        self._similarity_measure = similarity_measure
+        self._document_scorer = document_scorer
+        self._user_scorer = user_scorer
 
         self.db = DB(db_uri)
 
@@ -78,14 +86,16 @@ class Orchestrator:
             documents = self._get_documents()
 
         scores = [
-            self._similarity_measure(
-                doc.representation, transformed_query.representation
-            )
+            self._document_scorer(transformed_query.representation, doc)
             for doc in documents
         ]
         for i, doc in enumerate(documents):
             doc.score = scores[i]
-        sorted_documents = sorted(documents, key=lambda d: d.score)
+        sorted_documents = sorted(
+            documents,
+            key=lambda d: d.score,
+            reverse=self._document_scorer.higher_is_better,
+        )
         return sorted_documents[:max_docs]
 
     def describe_users(self, users: List[User]) -> np.array:
@@ -98,17 +108,15 @@ class Orchestrator:
         transformed_query = self.describe_documents([query_doc])[0]
 
         users = self._get_users()
-        transformed_users = self.describe_users(users)
 
         scores = [
-            self._similarity_measure(
-                user.representation, transformed_query.representation
-            )
-            for user in transformed_users
+            self._user_scorer(transformed_query.representation, user) for user in users
         ]
         for i, user in enumerate(users):
             user.score = scores[i]
-        sorted_users = sorted(users, key=lambda u: u.score)
+        sorted_users = sorted(
+            users, key=lambda u: u.score, reverse=self._user_scorer.higher_is_better
+        )
         sorted_users = sorted_users[:max_users]
 
         if filter_user_documents:

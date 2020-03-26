@@ -4,7 +4,7 @@ import streamlit as st
 from pdf2image import convert_from_path
 
 
-@st.cache
+@st.cache(show_spinner=False)
 def load_document(path: Path):
     images = convert_from_path(path, dpi=200)
     with open(path.with_suffix(".txt"), "r") as f:
