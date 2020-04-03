@@ -1,4 +1,5 @@
 from flask import Blueprint, current_app, jsonify, request
+from flask_jsonpify import jsonpify
 from km.utils import make_document
 
 api = Blueprint("api", __name__)
@@ -35,10 +36,10 @@ def query_users():
     return jsonify(results)
 
 
-@api.route("/describe/doc", methods=["GET"])
+@api.route("/describe/doc", methods=["POST"])
 def describe_doc():
     ork = current_app.orchestrator
-    doc = request.args.get("doc")
+    doc = request.get_json()
     if not doc:
         raise ValueError(f"You must provide a non-empty document content. Got `{doc}`")
 
@@ -53,7 +54,8 @@ def describe_doc():
     document_topics = {
         topic: score for topic, score in document_topics.items() if score > 0.05
     }
-    return jsonify(document_topics)
+
+    return jsonpify(document_topics)
 
 
 @api.route("/topics", methods=["GET"])
