@@ -42,7 +42,7 @@ class LDAModel(BaseDocRepresentation):
         topics = {
             i: {
                 feature_names[word]: round(topic[word], 2)
-                for word in topic.argsort()[:-11:-1]
+                for word in topic.argsort()[:-6:-1]
             }
             for i, topic in enumerate(components)
         }

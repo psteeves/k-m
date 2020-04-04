@@ -1,5 +1,4 @@
 from flask import Blueprint, current_app, jsonify, request
-from flask_jsonpify import jsonpify
 from km.utils import make_document
 
 api = Blueprint("api", __name__)
@@ -10,28 +9,21 @@ def ping():
     return "pong"
 
 
-@api.route("/query/docs", methods=["GET"])
+@api.route("/query/docs", methods=["POST"])
 def query_docs():
     ork = current_app.orchestrator
-    query = request.args.get("query")
-    limit = request.args.get("limit", 10)
-    if not query:
-        raise ValueError(f"You must provide a non-empty query. Got `{query}`")
-
-    results = ork.query_documents(query=str(query), max_docs=limit)
+    query = request.get_json()["query"]
+    results = ork.query_documents(query=query)
     results = [doc.serialize() for doc in results]
     return jsonify(results)
 
 
-@api.route("/query/users", methods=["GET"])
+@api.route("/query/users", methods=["POST"])
 def query_users():
     ork = current_app.orchestrator
-    query = request.args.get("query")
-    limit = request.args.get("limit")
-    if not query:
-        raise ValueError(f"You must provide a non-empty query. Got `{query}`")
+    query = request.get_json()["query"]
 
-    results = ork.query_users(query=str(query), max_users=limit)
+    results = ork.query_users(query=query)
     results = [user.serialize() for user in results]
     return jsonify(results)
 
@@ -39,23 +31,12 @@ def query_users():
 @api.route("/describe/doc", methods=["POST"])
 def describe_doc():
     ork = current_app.orchestrator
-    doc = request.get_json()
-    if not doc:
-        raise ValueError(f"You must provide a non-empty document content. Got `{doc}`")
+    content = request.get_json()["content"]
 
-    global_topics = ork.get_topics()
-    document_topic_scores = ork.describe_documents([make_document(content=doc)])[
-        0
-    ].representation.tolist()
-    document_topics = {
-        ", ".join(list(global_topics[i].keys())): score
-        for i, score in enumerate(document_topic_scores)
-    }
-    document_topics = {
-        topic: score for topic, score in document_topics.items() if score > 0.05
-    }
+    described_document = ork.describe_document(make_document(content=content))
+    named_topics = ork.get_named_topics(described_document, min_score=0.05)
 
-    return jsonpify(document_topics)
+    return jsonify(named_topics)
 
 
 @api.route("/topics", methods=["GET"])

@@ -73,26 +73,34 @@ class Orchestrator:
         logger.info(f"Model loaded from {path}")
         return self._document_model
 
-    def describe_documents(self, documents: List[Document]) -> np.array:
-        return self._document_model.transform(documents)
+    def describe_document(self, document: Document) -> Document:
+        return self._document_model.transform([document])[0]
 
-    def query_documents(
-        self, query: str, documents=None, max_docs: int = 5
-    ) -> List[Document]:
+    def get_named_topics(self, document: Document, min_score=1.0):
+        global_topics = self.get_topics()
+
+        named_topics = {
+            ", ".join(list(global_topics[i].keys())): score
+            for i, score in enumerate(document.representation.tolist())
+        }
+        named_topics = {
+            topic: score for topic, score in named_topics.items() if score > min_score
+        }
+        return named_topics
+
+    def query_documents(self, query: str, documents=None, max_docs: int = 5) -> List[Document]:
         query_doc = make_document(content=query)
-        transformed_query = self.describe_documents([query_doc])[0]
-
+        transformed_query = self.describe_document(query_doc)
         if documents is None:
             documents = self._get_documents()
 
-        scores = [
+        scored_documents = [
             self._document_scorer(transformed_query.representation, doc)
             for doc in documents
         ]
-        for i, doc in enumerate(documents):
-            doc.score = scores[i]
+
         sorted_documents = sorted(
-            documents,
+            scored_documents,
             key=lambda d: d.score,
             reverse=self._document_scorer.higher_is_better,
         )
@@ -105,17 +113,16 @@ class Orchestrator:
         self, query: str, filter_user_documents=True, max_users: int = 5
     ) -> List[User]:
         query_doc = make_document(content=query)
-        transformed_query = self.describe_documents([query_doc])[0]
+        transformed_query = self.describe_document(query_doc)
 
         users = self._get_users()
 
-        scores = [
+        scored_users = [
             self._user_scorer(transformed_query.representation, user) for user in users
         ]
-        for i, user in enumerate(users):
-            user.score = scores[i]
+
         sorted_users = sorted(
-            users, key=lambda u: u.score, reverse=self._user_scorer.higher_is_better
+            scored_users, key=lambda u: u.score, reverse=self._user_scorer.higher_is_better
         )
         sorted_users = sorted_users[:max_users]
 
