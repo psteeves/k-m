@@ -43,3 +43,28 @@ def describe_doc():
 def topics():
     ork = current_app.orchestrator
     return ork.get_topics()
+
+
+@api.route("/add/doc", methods=["POST"])
+def add_doc():
+    ork = current_app.orchestrator
+    content = request.get_json()["content"]
+    title = request.get_json()["title"]
+
+    # TODO fix session error
+
+    new_document = ork.create_new_demo_document(title=title, content=content)
+
+    # Set to None before sending response
+    new_document.representation = new_document.representation.tolist()
+    return jsonify(new_document)
+
+
+@api.route("/get/doc")
+def get_doc():
+    ork = current_app.orchestrator
+    doc_id = request.args.get('doc_id')
+
+    document = ork.get_document(doc_id=doc_id)
+    document.representation = document.representation.tolist()
+    return jsonify(document)

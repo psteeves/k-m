@@ -6,6 +6,7 @@ import structlog
 
 from km.data_models import Document, User
 from km.db.connection import DB
+from km.db.models import Document as DbDocument
 from km.representations.documents.base import BaseDocRepresentation
 from km.representations.documents.lda import LDAModel
 from km.representations.users.base import BaseUserRepresentation
@@ -131,3 +132,24 @@ class Orchestrator:
                 user.documents = self.query_documents(query, documents=user.documents)
 
         return sorted_users
+
+    def create_new_demo_document(self, content, title):
+        current_demo_document = self.db.session.query(DbDocument).filter_by(id=-1).one_or_none()
+        if current_demo_document is None:
+            current_demo_document = DbDocument(id=-1, title=title, content=content)
+        else:
+            current_demo_document.title = title
+            current_demo_document.content = content
+
+        simple_document = Document.from_db_model(current_demo_document)
+        current_demo_document.representation = self.describe_document(
+            simple_document).representation
+
+        self.db.session.add(current_demo_document)
+        self.db.session.commit()
+        logger.info(f"Added new demo document `{title}` to DB with id=-1")
+        return Document.from_db_model(current_demo_document)
+
+    def get_document(self, doc_id):
+        document = self.db.session.query(DbDocument).filter_by(id=-1).one()
+        return Document.from_db_model(document)
