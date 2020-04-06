@@ -1,3 +1,36 @@
 .App {
   text-align: center;
+  margin: 0;
+}
+
+header {
+  height: 90px
+}
+
+.company-name {
+  font-size: 50px;
+  color: rgba(38, 27, 255, 0.89);
+  margin: auto;
+}
+
+.search-bar {
+  background-color: rgba(38, 27, 255, 0.89);
+  height: 60px;
+  text-align: center;
+  display: flex;
+}
+
+.search-button {
+  height: 60px;
+  color: white !important;
+}
+
+.search-icon {
+  padding-left: 10px;
+  padding-right: 20px;
+}
+
+.search-text {
+  height: 50px;
+  color: white;
 }
