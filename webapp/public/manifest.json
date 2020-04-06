@@ -1,0 +1,7 @@
+{
+  "short_name": "CoLab Demo",
+  "name": "CoLab Technologies Demo",
+  "icons": [
+  "start_url": ".",
+  "display": "standalone",
+}
