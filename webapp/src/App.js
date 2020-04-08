@@ -3,6 +3,8 @@ import './App.css';
 import SearchBar from './SearchBar';
 import * as CoLabAPI from './CoLabAPI';
 import Lab from './Lab';
+import Document from './Document';
+import { Route } from 'react-router-dom';
 
 class App extends React.Component {
     constructor(props) {
@@ -23,7 +25,18 @@ class App extends React.Component {
                     /<h1 className="company-name">CoLab</h1>
                 </header>
                 <SearchBar/>
-                <Lab document={this.state.document}/>
+                <Route exact path="/" render={() => (
+                    <Lab document={this.state.document}/>
+                )}
+                />
+                <Route path="/documents" render={() => (
+                    <Document document={this.state.document}/>
+                )}
+                />
+                <Route path="/users" render={() => (
+                    "Not implemented yet!"
+                )}
+                />
             </div>
         );
     }
