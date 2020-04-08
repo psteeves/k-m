@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 
+from km.constants import DEFAULT_DATABASE_URI, DEFAULT_SERIALIZED_MODELS_DIR
 from km.orchestrator.orchestrator import Orchestrator
 from km.representations.documents.lda import LDAModel
 
@@ -20,9 +21,9 @@ def _parse_args():
     parser.add_argument(
         "-d",
         "--serialized-model-dir",
-        default="serialized_models/",
+        default=DEFAULT_SERIALIZED_MODELS_DIR,
         type=Path,
-        help="Name of model.",
+        help="Directory to serialize model to.",
     )
     return parser.parse_args()
 
@@ -30,7 +31,7 @@ def _parse_args():
 def main():
     args = _parse_args()
     topic_model = LDAModel(n_components=args.num_topics)
-    orchestrator = Orchestrator(document_model=topic_model)
+    orchestrator = Orchestrator(db_uri=DEFAULT_DATABASE_URI, document_model=topic_model)
 
     orchestrator.fit()
     model_path = (args.serialized_model_dir / args.model_name).with_suffix(".pkl")

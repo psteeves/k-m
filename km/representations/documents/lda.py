@@ -8,7 +8,7 @@ from km.representations.documents.base import BaseDocRepresentation
 
 
 class LDAModel(BaseDocRepresentation):
-    def __init__(self, n_components, max_df=0.5, min_df=0.001):
+    def __init__(self, n_components, max_df=0.25, min_df=0.0005):
         self._count_vectorizer = CountVectorizer(
             max_df=max_df, min_df=min_df, stop_words="english"
         )

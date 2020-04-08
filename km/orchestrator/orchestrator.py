@@ -77,19 +77,21 @@ class Orchestrator:
     def describe_document(self, document: Document) -> Document:
         return self._document_model.transform([document])[0]
 
-    def get_named_topics(self, document: Document, min_score=1.0):
+    def get_named_topics(self, document: Document, min_score=0.05):
         global_topics = self.get_topics()
 
         named_topics = {
             ", ".join(list(global_topics[i].keys())): score
             for i, score in enumerate(document.representation.tolist())
         }
-        named_topics = {
+        document.topics = {
             topic: score for topic, score in named_topics.items() if score > min_score
         }
-        return named_topics
+        return document
 
-    def query_documents(self, query: str, documents=None, max_docs: int = 5) -> List[Document]:
+    def query_documents(
+        self, query: str, documents=None, max_docs: int = 5
+    ) -> List[Document]:
         query_doc = make_document(content=query)
         transformed_query = self.describe_document(query_doc)
         if documents is None:
@@ -123,7 +125,9 @@ class Orchestrator:
         ]
 
         sorted_users = sorted(
-            scored_users, key=lambda u: u.score, reverse=self._user_scorer.higher_is_better
+            scored_users,
+            key=lambda u: u.score,
+            reverse=self._user_scorer.higher_is_better,
         )
         sorted_users = sorted_users[:max_users]
 
@@ -134,7 +138,9 @@ class Orchestrator:
         return sorted_users
 
     def create_new_demo_document(self, content, title):
-        current_demo_document = self.db.session.query(DbDocument).filter_by(id=-1).one_or_none()
+        current_demo_document = (
+            self.db.session.query(DbDocument).filter_by(id=-1).one_or_none()
+        )
         if current_demo_document is None:
             current_demo_document = DbDocument(id=-1, title=title, content=content)
         else:
@@ -143,7 +149,8 @@ class Orchestrator:
 
         simple_document = Document.from_db_model(current_demo_document)
         current_demo_document.representation = self.describe_document(
-            simple_document).representation
+            simple_document
+        ).representation
 
         self.db.session.add(current_demo_document)
         self.db.session.commit()

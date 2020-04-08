@@ -14,11 +14,12 @@ class Document:
     title: str
     content: str
     representation: Optional[np.array] = None
+    topics: Optional[Dict[str, float]] = None
     score: Optional[float] = None
 
     def serialize(self, keep_content=False):
         state = dataclasses.asdict(self)
-        state.pop("representation")
+        state["representation"] = state["representation"].tolist()
         if not keep_content:
             state.pop("content")
         return state

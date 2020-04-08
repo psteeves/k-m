@@ -1,4 +1,5 @@
 from flask import Blueprint, current_app, jsonify, request
+
 from km.utils import make_document
 
 api = Blueprint("api", __name__)
@@ -63,8 +64,9 @@ def add_doc():
 @api.route("/get/doc", methods=["POST"])
 def get_doc():
     ork = current_app.orchestrator
-    doc_id = request.args.get('doc_id')
+    doc_id = request.args.get("doc_id")
 
     document = ork.get_document(doc_id=doc_id)
+    document = ork.get_named_topics(document)
     document.representation = document.representation.tolist()
     return jsonify(document)

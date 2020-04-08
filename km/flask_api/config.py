@@ -1,5 +1,12 @@
+from km.constants import (
+    DEFAULT_DATABASE_URI,
+    DEFAULT_MODEL_NAME,
+    DEFAULT_SERIALIZED_MODELS_DIR,
+)
+
+
 class Config:
     PORT = 5001
-    DATABASE_URI = "sqlite:///km.sqlite"
-    SERIALIZED_MODEL_DIR = "serialized_models/"
-    SERIALIZED_MODEL_NAME = "lda_model_50.pkl"
+    DATABASE_URI = DEFAULT_DATABASE_URI
+    SERIALIZED_MODEL_DIR = DEFAULT_SERIALIZED_MODELS_DIR
+    SERIALIZED_MODEL_NAME = DEFAULT_MODEL_NAME + ".pkl"
