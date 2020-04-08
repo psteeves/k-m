@@ -34,3 +34,28 @@ header {
   height: 50px;
   color: white;
 }
+
+.doc-lab {
+    display: flex;
+    padding: 20px 20px;
+
+}
+
+.doc-content {
+    text-align: left;
+    margin: 10px 10px;
+    width: 2000px;
+}
+
+.doc-analysis {
+    margin: 10px 10px;
+    text-align: left;
+}
+
+.content-title {
+    border-bottom: 2px solid;
+}
+
+.analysis-title {
+    border-bottom: 2px solid;
+}

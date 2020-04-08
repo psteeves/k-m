@@ -60,7 +60,7 @@ def add_doc():
     return jsonify(new_document)
 
 
-@api.route("/get/doc")
+@api.route("/get/doc", methods=["POST"])
 def get_doc():
     ork = current_app.orchestrator
     doc_id = request.args.get('doc_id')
