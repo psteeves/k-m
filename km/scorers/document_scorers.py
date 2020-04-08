@@ -5,4 +5,6 @@ class EuclidianSimilarityScorer:
     higher_is_better = False
 
     def __call__(self, query_vector, doc):
-        return np.linalg.norm(query_vector - doc.representation)
+        score = np.linalg.norm(query_vector - doc.representation)
+        doc.score = score
+        return doc

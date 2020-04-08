@@ -9,3 +9,6 @@ test:
 
 run-app:
 	poetry run streamlit run app.py
+
+start-flask-app:
+	poetry run python -m km.flask_api.app

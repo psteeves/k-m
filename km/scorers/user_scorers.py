@@ -16,4 +16,5 @@ class ExponentiallyWeightedDocSimilarity:
         return score
 
     def __call__(self, query_vector, user):
-        return self._score(query_vector, user)
+        user.score = self._score(query_vector, user)
+        return user

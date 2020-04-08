@@ -5,3 +5,10 @@
 .mypy_cache/
 .nltk-data
 serialized_models
+
+webapp/node_modules
+webapp/.pnp.js
+webapp/.pnp
+
+webapp/build
+webapp/coverage
