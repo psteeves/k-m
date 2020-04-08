@@ -16,13 +16,13 @@ class Lab extends React.Component {
                 <Card className="doc-content">
                     <CardContent>
                         <Typography variant="h3" gutterBottom className="content-title">Your Read</Typography>
-                        <Typography variant="p">{this.createContentDisplay(this.props.document.content)}</Typography>
+                        <Typography variant="body1">{this.createContentDisplay(this.props.document.content)}</Typography>
                     </CardContent>
                 </Card>
                 <Card className="doc-analysis">
                     <CardContent>
                         <Typography variant="h3" gutterBottom className="analysis-title">Content Analysis</Typography>
-                        <LabAnalysis />
+                        <LabAnalysis document={this.props.document} />
                     </CardContent>
                 </Card>
             </div>

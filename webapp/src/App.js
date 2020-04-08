@@ -7,7 +7,7 @@ import Lab from './Lab';
 class App extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {document: {title: '', content: '', representation: []}}
+        this.state = {document: {title: '', content: '', representation: [], topics: {}}}
     }
 
     componentDidMount() {
