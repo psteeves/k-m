@@ -23,7 +23,7 @@ class App extends React.Component {
         return (
             <div className="App">
                 <header>
-                    /<h1 className="company-name">CoLab</h1>
+                    <h1 className="company-name">CoLab Technologies</h1>
                 </header>
                 <SearchBar/>
                 <Route exact path="/" render={() => (

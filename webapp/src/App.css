@@ -4,13 +4,17 @@
 }
 
 header {
-  height: 90px
+    height: 500px;
+    background-image: url("./collaboration_cropped.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .company-name {
   font-size: 50px;
-  color: rgba(38, 27, 255, 0.89);
+  color: rgb(53, 35, 38);
   margin: auto;
+    padding-top: 30px;
 }
 
 .search-bar {
