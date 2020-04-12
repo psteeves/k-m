@@ -20,6 +20,11 @@ class DB:
             query = query.limit(num_docs)
         return query.all()
 
+    def get_user_documents(self, user_id):
+        query = self.session.query(User).filter(User.id == user_id)
+        user = query.one()
+        return user.documents
+
     def get_users(self, num_users: Optional[int] = None):
         query = self.session.query(User)
         if num_users:

@@ -55,12 +55,10 @@ class User:
     representation: Optional[np.array] = None
     score: Optional[float] = None
 
-    def serialize(self, keep_content: bool = False, num_docs: Optional[int] = 10):
+    def serialize(self, keep_content: bool = False):
         state = dataclasses.asdict(self)
         state.pop("representation")
-        if num_docs is not None:
-            if len(state["documents"]) >= num_docs:
-                state["documents"] = random.sample(state["documents"], num_docs)
+
         for doc in state["documents"]:
             doc.pop("representation")
             if not keep_content:

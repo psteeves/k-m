@@ -3,6 +3,7 @@ from typing import List, Optional
 
 import numpy as np
 import structlog
+from functools import lru_cache
 
 from km.data_models import Document, User
 from km.db.connection import DB
@@ -52,6 +53,9 @@ class Orchestrator:
         db_docs = self.db.get_documents(num_docs)
         return [Document.from_db_model(doc) for doc in db_docs]
 
+    def _get_user_documents(self, user_id):
+        return self.db.get_user_documents(user_id)
+
     def _get_users(self, num_users: Optional[int] = None):
         db_users = self.db.get_users(num_users)
         return [User.from_db_model(user) for user in db_users]
@@ -89,13 +93,19 @@ class Orchestrator:
         }
         return document
 
+    @lru_cache(maxsize=4)
     def query_documents(
-        self, query: str, documents=None, max_docs: int = 5
+        self, query: str, user_docs_id: Optional[int]=None, max_docs: int = 5
     ) -> List[Document]:
+        """
+        :param user_docs_id: If specified, will query documents filtered by user who authored them.
+        """
         query_doc = make_document(content=query)
         transformed_query = self.describe_document(query_doc)
-        if documents is None:
+        if user_docs_id is None:
             documents = self._get_documents()
+        else:
+            documents = [Document.from_db_model(document) for document in self._get_user_documents(user_docs_id)]
 
         scored_documents = [
             self._document_scorer(transformed_query.representation, doc)
@@ -112,16 +122,17 @@ class Orchestrator:
     def describe_users(self, users: List[User]) -> np.array:
         return self._user_model.transform(users)
 
+    @lru_cache(maxsize=4)
     def query_users(
         self, query: str, filter_user_documents=True, max_users: int = 5
     ) -> List[User]:
         query_doc = make_document(content=query)
-        transformed_query = self.describe_document(query_doc)
+        transformed_query = self.describe_document(query_doc).representation
 
         users = self._get_users()
 
         scored_users = [
-            self._user_scorer(transformed_query.representation, user) for user in users
+            self._user_scorer(transformed_query, user) for user in users
         ]
 
         sorted_users = sorted(
@@ -133,7 +144,7 @@ class Orchestrator:
 
         if filter_user_documents:
             for user in sorted_users:
-                user.documents = self.query_documents(query, documents=user.documents)
+                user.documents = self.query_documents(query, user_docs_id=user.id, max_docs=4)
 
         return sorted_users
 

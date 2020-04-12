@@ -11,7 +11,7 @@ class ExponentiallyWeightedDocSimilarity:
     def _score(self, query_vector, user):
         score = 0.0
         for doc in user.documents:
-            similarity = self._similarity_measure(query_vector, doc)
+            similarity = self._similarity_measure(query_vector, doc).score
             score += np.e ** (-self._power * similarity)
         return score
 

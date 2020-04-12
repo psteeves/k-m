@@ -4,6 +4,7 @@ import SearchBar from './SearchBar';
 import * as CoLabAPI from './CoLabAPI';
 import Lab from './Lab';
 import DocumentResults from './DocumentResults';
+import UserResults from './UserResults'
 import { Route } from 'react-router-dom';
 
 
@@ -35,7 +36,7 @@ class App extends React.Component {
                 )}
                 />
                 <Route path="/users" render={() => (
-                    "Not implemented yet!"
+                    <UserResults document={this.state.document}/>
                 )}
                 />
             </div>
