@@ -18,6 +18,7 @@ header {
   height: 60px;
   text-align: center;
   display: flex;
+    margin-bottom: 50px;
 }
 
 .search-button {
@@ -58,4 +59,15 @@ header {
 
 .analysis-title {
     border-bottom: 2px solid;
+}
+
+.doc-results-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.document-result {
+    height: 500px;
+    width: 400px;
+    margin: 20px;
 }

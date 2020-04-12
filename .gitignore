@@ -2,11 +2,13 @@
 **/__pycache__
 **/.ipynb_checkpoints
 
+articles.sqlite
 .mypy_cache/
 .nltk-data
 serialized_models
 
 webapp/node_modules
+webapp/package-lock.json
 webapp/.pnp.js
 webapp/.pnp
 

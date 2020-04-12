@@ -17,7 +17,7 @@ class Document:
     topics: Optional[Dict[str, float]] = None
     score: Optional[float] = None
 
-    def serialize(self, keep_content=False):
+    def serialize(self, keep_content=True):
         state = dataclasses.asdict(self)
         state["representation"] = state["representation"].tolist()
         if not keep_content:

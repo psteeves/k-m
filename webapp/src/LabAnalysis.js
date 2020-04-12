@@ -72,8 +72,11 @@ class LabAnalysis extends React.Component {
             .attr("fill", d => colorScale(1 - x(d.topic)/ chart_width));
     };
 
-    render() {
+    componentDidMount() {
         this.drawBarChart(this.props.document.topics);
+    }
+
+    render() {
         return <div className="topics-viz"></div>
     }
 }
