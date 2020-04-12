@@ -116,12 +116,12 @@ class Orchestrator:
         self, query: str, filter_user_documents=True, max_users: int = 5
     ) -> List[User]:
         query_doc = make_document(content=query)
-        transformed_query = self.describe_document(query_doc)
+        transformed_query = self.describe_document(query_doc).representation
 
         users = self._get_users()
 
         scored_users = [
-            self._user_scorer(transformed_query.representation, user) for user in users
+            self._user_scorer(transformed_query, user) for user in users
         ]
 
         sorted_users = sorted(
