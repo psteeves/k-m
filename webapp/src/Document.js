@@ -7,10 +7,10 @@ import CardContent from '@material-ui/core/CardContent';
 class Document extends React.Component {
     render() {
         return (
-            <Card className="document">
+            <Card className="document-result">
                 <CardContent>
-                    <Typography variant="h3" gutterBottom className="document-title">{this.props.document.title}</Typography>
-                    <Typography variant="body1">{this.props.document.content}</Typography>
+                    <Typography variant="h4" gutterBottom className="document-title">{this.props.document.title}</Typography>
+                    <Typography variant="body1" align="left">{this.props.document.content}</Typography>
                 </CardContent>
             </Card>
         )

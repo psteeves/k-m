@@ -3,8 +3,9 @@ import './App.css';
 import SearchBar from './SearchBar';
 import * as CoLabAPI from './CoLabAPI';
 import Lab from './Lab';
-import Document from './Document';
+import DocumentResults from './DocumentResults';
 import { Route } from 'react-router-dom';
+
 
 class App extends React.Component {
     constructor(props) {
@@ -30,7 +31,7 @@ class App extends React.Component {
                 )}
                 />
                 <Route path="/documents" render={() => (
-                    <Document document={this.state.document}/>
+                    <DocumentResults document={this.state.document}/>
                 )}
                 />
                 <Route path="/users" render={() => (
