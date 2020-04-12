@@ -11,17 +11,17 @@ header {
 }
 
 .company-name {
-  font-size: 50px;
-  color: rgb(53, 35, 38);
-  margin: auto;
+    font-size: 50px;
+    color: rgb(53, 35, 38);
+    margin: auto;
     padding-top: 30px;
 }
 
 .search-bar {
-  background-color: rgba(38, 27, 255, 0.89);
-  height: 60px;
-  text-align: center;
-  display: flex;
+    background-color: rgba(38, 27, 255, 0.89);
+    height: 60px;
+    text-align: center;
+    display: flex;
     margin-bottom: 50px;
 }
 
@@ -71,6 +71,17 @@ header {
 }
 
 .document-result {
+    height: 500px;
+    width: 400px;
+    margin: 20px;
+}
+
+.user-results-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.user-result {
     height: 500px;
     width: 400px;
     margin: 20px;
