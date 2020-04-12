@@ -9,8 +9,13 @@ class User extends React.Component {
         return (
             <Card className="user-result">
                 <CardContent>
-                    <Typography variant="h4" gutterBottom className="user-title">{this.props.user.email}</Typography>
-                    <Typography variant="body1" align="left">{this.props.user.email}</Typography>
+                    <Typography variant="h5" gutterBottom className="user-title">{this.props.user.email}</Typography>
+                    <Typography variant="body1" align="left">Authored:</Typography>
+                    <ul>
+                        {this.props.user.documents.map(doc => <li>
+                            <Typography align="left">{doc.title}</Typography>
+                        </li>)}
+                    </ul>
                 </CardContent>
             </Card>
         )
