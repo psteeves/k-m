@@ -29,6 +29,18 @@ class LDAModel(BaseDocRepresentation):
             doc.representation = representations[i]
         return documents
 
+    def get_named_topics(self, document: Document, min_score=0.05) -> Document:
+        global_topics = self.explain()
+
+        named_topics = {
+            ", ".join(list(global_topics[i].keys())): score
+            for i, score in enumerate(document.representation.tolist())
+        }
+        document.topics = {
+            topic: score for topic, score in named_topics.items() if score > min_score
+        }
+        return document
+
     def explain(self):
         try:
             components = self._lda_model.components_
