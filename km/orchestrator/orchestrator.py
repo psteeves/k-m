@@ -1,9 +1,9 @@
 import pickle
+from functools import lru_cache
 from typing import List, Optional
 
 import numpy as np
 import structlog
-from functools import lru_cache
 
 from km.data_models import Document, User
 from km.db.connection import DB
@@ -88,9 +88,7 @@ class Orchestrator:
         return self._user_model.transform(users)
 
     @lru_cache(maxsize=4)
-    def query_documents(
-        self, query: str, max_docs: int = 5
-    ) -> List[Document]:
+    def query_documents(self, query: str, max_docs: int = 5) -> List[Document]:
         query_doc = make_document(content=query)
         transformed_query = self.describe_document(query_doc)
         documents = self._get_documents()
@@ -108,9 +106,12 @@ class Orchestrator:
         return sorted_documents[:max_docs]
 
     @lru_cache(maxsize=16)
-    def _query_user_documents(self, query:str, user_id, max_docs: int=4):
+    def _query_user_documents(self, query: str, user_id, max_docs: int = 4):
         query_doc = make_document(content=query)
-        documents = [Document.from_db_model(document) for document in self._get_user_documents(user_id)]
+        documents = [
+            Document.from_db_model(document)
+            for document in self._get_user_documents(user_id)
+        ]
         transformed_query = self.describe_document(query_doc)
 
         scored_documents = [
@@ -134,9 +135,7 @@ class Orchestrator:
 
         users = self._get_users()
 
-        scored_users = [
-            self._user_scorer(transformed_query, user) for user in users
-        ]
+        scored_users = [self._user_scorer(transformed_query, user) for user in users]
 
         sorted_users = sorted(
             scored_users,

@@ -56,7 +56,9 @@ def get_files(path: Path, uri: str) -> None:
         for doc_path in tqdm.tqdm(doc_paths):
             doc_id = int(doc_path.stem)
             doc = json.load(open(doc_path))
-            doc_model = Document(id=doc_id, title=doc["title"], content=doc["content"])
+            doc_model = Document(
+                id=doc_id, title=doc["title"], content=doc["content"], date=doc["date"]
+            )
             simple_document = SimpleDocument.from_db_model(doc_model)
             representation = document_representation_model([simple_document])[
                 0
@@ -68,7 +70,14 @@ def get_files(path: Path, uri: str) -> None:
         user_labels = json.load(open(user_labels_path))
         logger.info(f"Parsing user labels for {len(user_labels)} users")
         for user_id, info in tqdm.tqdm(user_labels.items()):
-            user_model = User(id=user_id, email=info["email"])
+            user_model = User(
+                id=user_id,
+                email=info["email"],
+                name=info["name"],
+                location=info["location"],
+                title=info["title"],
+                image_path=info["image_path"],
+            )
             for doc_id in info["document_ids"]:
                 doc = docs[int(doc_id)]
                 user_model.documents.append(doc)
