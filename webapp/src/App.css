@@ -4,21 +4,19 @@
 }
 
 header {
-    height: 500px;
-    background-image: url("./collaboration_cropped.jpg");
-    background-repeat: no-repeat;
-    background-size: cover;
+    height: 120px;
+    background-color: rgba(106, 106, 106, 0.89);
 }
 
 .company-name {
     font-size: 50px;
-    color: rgb(53, 35, 38);
+    color: rgb(0, 0, 0);
     margin: auto;
     padding-top: 30px;
 }
 
 .search-bar {
-    background-color: rgba(38, 27, 255, 0.89);
+    background-color: rgba(0, 0, 0, 0.89);
     height: 60px;
     text-align: center;
     display: flex;
@@ -73,6 +71,7 @@ header {
 }
 
 .user-result {
+    background-color: rgba(0, 0, 0, 0.04) !important;
     display: flex;
     height: 500px;
     width: 1600px;
@@ -92,4 +91,9 @@ header {
 .document-result-left {
     width: 800px;
     margin-right: 100px;
+}
+
+.right-pane-title {
+    font-weight: 900 !important;
+    margin-top: 20px !important;
 }
