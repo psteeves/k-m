@@ -1,5 +1,5 @@
 import dataclasses
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 import numpy as np
 
@@ -13,6 +13,8 @@ class Document:
     title: str
     content: str
     date: str
+    # Only keep user emails for now
+    authors: List["User"] = dataclasses.field(default_factory=list)
     representation: Optional[np.array] = None
     topics: Optional[Dict[str, float]] = None
     score: Optional[float] = None
@@ -20,18 +22,20 @@ class Document:
     def serialize(self, keep_content=True):
         state = dataclasses.asdict(self)
         state["representation"] = state["representation"].tolist()
+        state["authors"] = [u["email"] for u in state["authors"]]
         if not keep_content:
             state.pop("content")
         return state
 
     @classmethod
-    def from_db_model(cls, db_model: DbDocument) -> "Document":
+    def from_db_model(cls, db_model: DbDocument, get_authors=False) -> "Document":
         return cls(
             id=db_model.id,
             title=db_model.title,
             content=db_model.content,
             date=db_model.date,
             representation=db_model.representation,
+            authors=db_model.users if get_authors else [],
         )
 
     def __repr__(self):

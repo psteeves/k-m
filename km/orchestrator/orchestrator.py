@@ -1,4 +1,5 @@
 import pickle
+import random
 from functools import lru_cache
 from typing import List, Optional
 
@@ -50,7 +51,7 @@ class Orchestrator:
         self.db = DB(db_uri)
 
     def _get_documents(self, num_docs: Optional[int] = None):
-        db_docs = self.db.get_documents(num_docs)
+        db_docs = self.db.get_documents(num_docs=num_docs)
         return [Document.from_db_model(doc) for doc in db_docs]
 
     def _get_user_documents(self, user_id):
@@ -87,6 +88,19 @@ class Orchestrator:
     def describe_users(self, users: List[User]) -> np.array:
         return self._user_model.transform(users)
 
+    def _get_authors_for_documents(self, documents: List[Document]):
+        """
+        Hacky method for adding random users to documents. This is because the SQL queries are too slow for demo purposes
+        # TODO use proper authors
+        """
+        users = self._get_users()
+        docs_with_authors = []
+        for doc in documents:
+            doc.authors = [User.from_db_model(u) for u in random.sample(users, 1)]
+            docs_with_authors.append(doc)
+
+        return docs_with_authors
+
     @lru_cache(maxsize=4)
     def query_documents(self, query: str, max_docs: int = 5) -> List[Document]:
         query_doc = make_document(content=query)
@@ -103,7 +117,10 @@ class Orchestrator:
             key=lambda d: d.score,
             reverse=self._document_scorer.higher_is_better,
         )
-        return sorted_documents[:max_docs]
+        # Exclude demo document, which will have a distance of 0
+        results = sorted_documents[1 : max_docs + 1]
+        results = self._get_authors_for_documents(results)
+        return results
 
     @lru_cache(maxsize=16)
     def _query_user_documents(self, query: str, user_id, max_docs: int = 4):
@@ -124,6 +141,7 @@ class Orchestrator:
             key=lambda d: d.score,
             reverse=self._document_scorer.higher_is_better,
         )
+
         return sorted_documents[:max_docs]
 
     @lru_cache(maxsize=4)
@@ -150,15 +168,18 @@ class Orchestrator:
 
         return sorted_users
 
-    def create_new_demo_document(self, content, title):
+    def create_new_demo_document(self, content, title, date):
         current_demo_document = (
             self.db.session.query(DbDocument).filter_by(id=-1).one_or_none()
         )
         if current_demo_document is None:
-            current_demo_document = DbDocument(id=-1, title=title, content=content)
+            current_demo_document = DbDocument(
+                id=-1, title=title, content=content, date=date
+            )
         else:
             current_demo_document.title = title
             current_demo_document.content = content
+            current_demo_document.date = date
 
         simple_document = Document.from_db_model(current_demo_document)
         current_demo_document.representation = self.describe_document(
