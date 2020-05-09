@@ -14,14 +14,13 @@ class Document extends React.Component {
                     <Typography variant="body1" align="left">{this.props.document.content}</Typography>
                 </CardContent>
                 <CardContent>
-                    <Typography variant="body1" align="left">Match</Typography>
+                    <Typography variant="body1" align="left" className="right-pane-title">Match</Typography>
                     {/* User scores range from 0 to 1 */}
                     <Typography variant="body1" align="left">{(100 * (1 - this.props.document.score)).toFixed(0)}%</Typography>
-                    <br/>
-                    <br/>
-                    <Typography variant="body1" align="left">Details</Typography>
-                    <Typography variant="body1" align="left">Created: {this.props.document.date}</Typography>
-                    <Typography variant="body1" align="left">Author: {this.props.document.authors[0]}</Typography>
+
+                    <Typography variant="body1" align="left" className="right-pane-title">Details</Typography>
+                    <Typography variant="body1" align="left" className="right-pane-item"><i>Created:</i> {this.props.document.date}</Typography>
+                    <Typography variant="body1" align="left" className="right-pane-item"><i>Author:</i> {this.props.document.authors[0]}</Typography>
                 </CardContent>
             </Card>
         )

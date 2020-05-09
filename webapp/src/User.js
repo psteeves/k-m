@@ -19,16 +19,16 @@ class User extends React.Component {
                     <Button variant="outlined" >Message on Slack</Button>
                 </CardContent>
                 <CardContent>
-                    <Typography variant="body1" align="left">Match</Typography>
+                    <Typography variant="body1" align="left" className="right-pane-title">Match</Typography>
+
                     { /* User scores range from 0 to 1, but mostly around 0 */ }
-                    <Typography variant="body1" align="left">{(80 * 100 * this.props.user.score).toFixed(0)}%</Typography>
-                    <br/>
-                    <br/>
-                    <Typography variant="body1" align="left">Details</Typography>
-                    <Typography variant="body1" align="left">Email: {this.props.user.email}</Typography>
-                    <Typography variant="body1" align="left">Title: {this.props.user.title}</Typography>
-                    <Typography variant="body1" align="left">Location: {this.props.user.location}</Typography>
-                    <Typography variant="body1" align="left">Internal documents authored:</Typography>
+                    <Typography align="left">{(80 * 100 * this.props.user.score).toFixed(0)}%</Typography>
+
+                    <Typography variant="body1" align="left" className="right-pane-title">Details</Typography>
+                    <Typography variant="body1" align="left" className="right-pane-item"><i>Email:</i> {this.props.user.email}</Typography>
+                    <Typography variant="body1" align="left" className="right-pane-item"><i>Title:</i> {this.props.user.title}</Typography>
+                    <Typography variant="body1" align="left" className="right-pane-item"><i>Location:</i> {this.props.user.location}</Typography>
+                    <Typography variant="body1" align="left" className="right-pane-title">Internal documents authored</Typography>
                     <ul>
                         {this.props.user.documents.map(doc => (
                             <li key={doc.id}>
