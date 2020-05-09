@@ -20,7 +20,7 @@ class DocumentResults extends React.Component {
         return (
             <div>
                 <Typography variant="h3">Most similar internal documents</Typography>
-                <div className="doc-results-list">
+                <div className="results-list">
                 {this.state.documents.map(doc => <Document document={doc}/>)}
                 </div>
             </div>
