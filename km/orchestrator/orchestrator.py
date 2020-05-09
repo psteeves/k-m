@@ -150,15 +150,18 @@ class Orchestrator:
 
         return sorted_users
 
-    def create_new_demo_document(self, content, title):
+    def create_new_demo_document(self, content, title, date):
         current_demo_document = (
             self.db.session.query(DbDocument).filter_by(id=-1).one_or_none()
         )
         if current_demo_document is None:
-            current_demo_document = DbDocument(id=-1, title=title, content=content)
+            current_demo_document = DbDocument(
+                id=-1, title=title, content=content, date=date
+            )
         else:
             current_demo_document.title = title
             current_demo_document.content = content
+            current_demo_document.date = date
 
         simple_document = Document.from_db_model(current_demo_document)
         current_demo_document.representation = self.describe_document(

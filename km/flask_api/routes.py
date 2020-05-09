@@ -5,11 +5,6 @@ from km.utils import make_document
 api = Blueprint("api", __name__)
 
 
-@api.route("/ping", methods=["GET"])
-def ping():
-    return "pong"
-
-
 @api.route("/query/docs", methods=["POST"])
 def query_docs():
     ork = current_app.orchestrator
@@ -49,12 +44,14 @@ def topics():
 @api.route("/add/doc", methods=["POST"])
 def add_doc():
     ork = current_app.orchestrator
-    content = request.get_json()["content"]
-    title = request.get_json()["title"]
+    params = request.get_json()
+    content = params["content"]
+    title = params["title"]
+    date = params["date"]
 
     # TODO fix session error
 
-    new_document = ork.create_new_demo_document(title=title, content=content)
+    new_document = ork.create_new_demo_document(title=title, content=content, date=date)
 
     # Set to None before sending response
     new_document.representation = new_document.representation.tolist()
