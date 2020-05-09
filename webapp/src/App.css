@@ -65,24 +65,31 @@ header {
     border-bottom: 2px solid;
 }
 
-.doc-results-list {
-    display: flex;
-    flex-wrap: wrap;
-}
-
 .document-result {
-    height: 500px;
-    width: 400px;
-    margin: 20px;
-}
-
-.user-results-list {
     display: flex;
-    flex-wrap: wrap;
+    height: 500px;
+    width: 1600px;
+    margin: 40px;
 }
 
 .user-result {
+    display: flex;
     height: 500px;
+    width: 1600px;
+    margin: 40px;
+}
+
+.user-result-left {
     width: 400px;
-    margin: 20px;
+    margin-right: 50px;
+    text-align: left;
+}
+
+.user-photo {
+    margin-bottom: 20px;
+}
+
+.document-result-left {
+    width: 800px;
+    margin-right: 100px;
 }

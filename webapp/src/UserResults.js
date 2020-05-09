@@ -20,8 +20,8 @@ class UserResults extends React.Component {
         return (
             <div>
                 <Typography variant="h3">Most relevant internal experts</Typography>
-                <div className="user-results-list">
-                {this.state.users.map(user => <User user={user}/>)}
+                <div className="results-list">
+                    {this.state.users.map(user => <User user={user}/>)}
                 </div>
             </div>
         )
