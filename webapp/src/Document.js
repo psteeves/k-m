@@ -10,6 +10,8 @@ class Document extends React.Component {
             <Card className="document-result">
                 <CardContent>
                     <Typography variant="h4" gutterBottom className="document-title">{this.props.document.title}</Typography>
+                    <Typography variant="body1" align="left">Created: {this.props.document.date}</Typography>
+                    <Typography variant="body1" align="left">Author: {this.props.document.authors[0]}</Typography>
                     <Typography variant="body1" align="left">{this.props.document.content}</Typography>
                 </CardContent>
             </Card>

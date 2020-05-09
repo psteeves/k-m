@@ -11,7 +11,7 @@ import { Route } from 'react-router-dom';
 class App extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {document: {title: '', content: '', representation: [], topics: {}}}
+        this.state = {document: {title: '', content: '', representation: [], topics: {}, authors: []}}
     }
 
     componentDidMount() {
