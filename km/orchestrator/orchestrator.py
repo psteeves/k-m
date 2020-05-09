@@ -1,9 +1,9 @@
 import pickle
+from functools import lru_cache
 from typing import List, Optional
 
 import numpy as np
 import structlog
-from functools import lru_cache
 
 from km.data_models import Document, User
 from km.db.connection import DB
@@ -82,30 +82,16 @@ class Orchestrator:
         return self._document_model.transform([document])[0]
 
     def get_named_topics(self, document: Document, min_score=0.05):
-        global_topics = self.get_topics()
+        return self._document_model.get_named_topics(document, min_score=min_score)
 
-        named_topics = {
-            ", ".join(list(global_topics[i].keys())): score
-            for i, score in enumerate(document.representation.tolist())
-        }
-        document.topics = {
-            topic: score for topic, score in named_topics.items() if score > min_score
-        }
-        return document
+    def describe_users(self, users: List[User]) -> np.array:
+        return self._user_model.transform(users)
 
     @lru_cache(maxsize=4)
-    def query_documents(
-        self, query: str, user_docs_id: Optional[int]=None, max_docs: int = 5
-    ) -> List[Document]:
-        """
-        :param user_docs_id: If specified, will query documents filtered by user who authored them.
-        """
+    def query_documents(self, query: str, max_docs: int = 5) -> List[Document]:
         query_doc = make_document(content=query)
         transformed_query = self.describe_document(query_doc)
-        if user_docs_id is None:
-            documents = self._get_documents()
-        else:
-            documents = [Document.from_db_model(document) for document in self._get_user_documents(user_docs_id)]
+        documents = self._get_documents()
 
         scored_documents = [
             self._document_scorer(transformed_query.representation, doc)
@@ -119,8 +105,26 @@ class Orchestrator:
         )
         return sorted_documents[:max_docs]
 
-    def describe_users(self, users: List[User]) -> np.array:
-        return self._user_model.transform(users)
+    @lru_cache(maxsize=16)
+    def _query_user_documents(self, query: str, user_id, max_docs: int = 4):
+        query_doc = make_document(content=query)
+        documents = [
+            Document.from_db_model(document)
+            for document in self._get_user_documents(user_id)
+        ]
+        transformed_query = self.describe_document(query_doc)
+
+        scored_documents = [
+            self._document_scorer(transformed_query.representation, doc)
+            for doc in documents
+        ]
+
+        sorted_documents = sorted(
+            scored_documents,
+            key=lambda d: d.score,
+            reverse=self._document_scorer.higher_is_better,
+        )
+        return sorted_documents[:max_docs]
 
     @lru_cache(maxsize=4)
     def query_users(
@@ -131,9 +135,7 @@ class Orchestrator:
 
         users = self._get_users()
 
-        scored_users = [
-            self._user_scorer(transformed_query, user) for user in users
-        ]
+        scored_users = [self._user_scorer(transformed_query, user) for user in users]
 
         sorted_users = sorted(
             scored_users,
@@ -144,7 +146,7 @@ class Orchestrator:
 
         if filter_user_documents:
             for user in sorted_users:
-                user.documents = self.query_documents(query, user_docs_id=user.id, max_docs=4)
+                user.documents = self._query_user_documents(query, user.id)
 
         return sorted_users
 

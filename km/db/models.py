@@ -17,13 +17,21 @@ class Document(Base):
     __tablename__ = "document"
     id = Column(Integer, primary_key=True)
     title = Column(String, nullable=False)
+    date = Column(String, nullable=False)
     content = Column(String, nullable=False)
     representation = Column(PickleType, nullable=True)
+    users = relationship("User", secondary=user_documents, back_populates="documents")
 
 
 class User(Base):
     __tablename__ = "user"
     id = Column(Integer, primary_key=True)
     email = Column(String)
-    documents = relationship("Document", secondary=user_documents, backref="users")
+    name = Column(String)
+    image_path = Column(String)
+    location = Column(String)
+    title = Column(String)
+    documents = relationship(
+        "Document", secondary=user_documents, back_populates="users"
+    )
     representation = Column(PickleType, nullable=True)

@@ -9,8 +9,8 @@ class LabAnalysis extends React.Component {
         .sort((a, b) => b.score - a.score);
 
         const total_width = 800;
-        const total_height = 200;
-        const legend_width = 400;
+        const total_height = 300;
+        const legend_width = 500;
         const margin = {top: 20, right: 0, bottom: 10, left: 30};
         const chart_width = total_width - legend_width - margin.left - margin.right;
         const chart_height = total_height - margin.top - margin.bottom;
@@ -56,7 +56,7 @@ class LabAnalysis extends React.Component {
             .text(d => d.topic)
             .attr("x", total_width - legend_width + 10)
             .attr("y", (d, i) => total_height / 10 + i*25)
-            .attr("font-size", "8px")
+            .attr("font-size", "14px")
             .attr("text-anchor", "left")
             .style("alignment-baseline", "middle");
 
