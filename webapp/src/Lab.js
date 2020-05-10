@@ -7,7 +7,7 @@ import LabAnalysis from './LabAnalysis';
 
 class Lab extends React.Component {
      createContentDisplay(content) {
-         return content.slice(0, 1000) + "..."
+         return content.slice(0, 2000) + "..."
     }
 
     render() {
@@ -15,7 +15,7 @@ class Lab extends React.Component {
             <div className="doc-lab">
                 <Card className="doc-content">
                     <CardContent>
-                        <Typography variant="h3" gutterBottom className="content-title">Your Read</Typography>
+                        <Typography variant="h3" gutterBottom className="content-title">What You're Reading</Typography>
                         <Typography variant="body1">{this.createContentDisplay(this.props.document.content)}</Typography>
                     </CardContent>
                 </Card>

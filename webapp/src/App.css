@@ -45,12 +45,14 @@ header {
 }
 
 .doc-content {
+    background-color: rgba(0, 0, 0, 0.04) !important;
     text-align: left;
     margin: 10px 10px;
     width: 700px;
 }
 
 .doc-analysis {
+    background-color: rgba(0, 0, 0, 0.04) !important;
     margin: 10px 10px;
     text-align: left;
 }
@@ -64,6 +66,7 @@ header {
 }
 
 .document-result {
+    background-color: rgba(0, 0, 0, 0.04) !important;
     display: flex;
     height: 500px;
     width: 1600px;

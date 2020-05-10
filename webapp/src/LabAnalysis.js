@@ -1,9 +1,23 @@
 import React from 'react';
 import * as d3 from 'd3';
+import Typography from '@material-ui/core/Typography';
 
 
 class LabAnalysis extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {selectedTopic: 0};
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+    handleClick(d, i) {
+        this.setState({selectedTopic: i})
+    }
+
     drawBarChart(topics) {
+        // Clear graph
+        d3.selectAll("svg").remove();
+
         const data = Object.entries(topics)
         .map(item => { return {topic: item[0], score: item[1]}})
         .sort((a, b) => b.score - a.score);
@@ -38,28 +52,16 @@ class LabAnalysis extends React.Component {
             .call(d3.axisLeft(y)
                 .ticks(4));
 
-        const colorScale = d3.interpolateBlues;
-
-        svg.selectAll("legend-dots")
-          .data(data)
-          .enter()
-          .append("circle")
-            .attr("cx", total_width - legend_width)
-            .attr("cy", (d,i) => total_height / 10 + i*25)
-            .attr("r", 5)
-            .style("fill", d => colorScale(1 - x(d.topic)/ chart_width));
-
-        svg.selectAll("legend-dots")
+        svg.selectAll("legend")
           .data(data)
           .enter()
           .append("text")
-            .text(d => d.topic)
+            .text((d, i) => i === this.state.selectedTopic? `Topic keywords: ${d.topic}` : "")
             .attr("x", total_width - legend_width + 10)
-            .attr("y", (d, i) => total_height / 10 + i*25)
+            .attr("y", () => total_height / 3)
             .attr("font-size", "14px")
             .attr("text-anchor", "left")
             .style("alignment-baseline", "middle");
-
 
         svg.selectAll("bar")
             .data(data)
@@ -69,15 +71,24 @@ class LabAnalysis extends React.Component {
             .attr("y", d => y(d.score))
             .attr("width", x.bandwidth())
             .attr("height", (d) => chart_height - y(d.score))
-            .attr("fill", d => colorScale(1 - x(d.topic)/ chart_width));
+            .attr("fill", (d, i) => i === this.state.selectedTopic? "black" : "grey")
+            .on("click", this.handleClick);
     };
 
-    componentDidMount() {
-        this.drawBarChart(this.props.document.topics);
-    }
-
     render() {
-        return <div className="topics-viz"></div>
+        this.drawBarChart(this.props.document.topics);
+        return (
+            <div>
+                <br/>
+                <Typography variant="h4">Document Topics</Typography>
+                <Typography variant="body1" gutterBottom><i>Click topics to inspect</i></Typography>
+                <br/>
+                <div className="topics-viz"></div>
+                <br/><br/><br/>
+                <Typography variant="h4">Important keywords</Typography>
+            </div>
+
+        )
     }
 }
 
