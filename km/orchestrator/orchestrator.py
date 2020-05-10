@@ -11,6 +11,7 @@ from km.db.connection import DB
 from km.db.models import Document as DbDocument
 from km.representations.documents.base import BaseDocRepresentation
 from km.representations.documents.lda import LDAModel
+from km.representations.documents.tf_idf import TFIDFModel
 from km.representations.users.base import BaseUserRepresentation
 from km.representations.users.topic_concatenator import TopicConcatenator
 from km.scorers.document_scorers import EuclidianSimilarityScorer
@@ -24,13 +25,17 @@ class Orchestrator:
     def __init__(
         self,
         db_uri: str,
-        document_model: Optional[BaseDocRepresentation] = None,
+        topic_model: Optional[BaseDocRepresentation] = None,
+        keyword_model: Optional[BaseDocRepresentation] = None,
         user_model: Optional[BaseUserRepresentation] = None,
         document_scorer=None,
         user_scorer=None,
     ):
-        if document_model is None:
-            document_model = LDAModel(n_components=25)
+        if topic_model is None:
+            topic_model = LDAModel()
+
+        if keyword_model is None:
+            keyword_model = TFIDFModel()
 
         if user_model is None:
             user_model = TopicConcatenator()
@@ -43,7 +48,8 @@ class Orchestrator:
                 similarity_measure=document_scorer
             )
 
-        self._document_model = document_model
+        self._topic_model = topic_model
+        self._keyword_model = keyword_model
         self._user_model = user_model
         self._document_scorer = document_scorer
         self._user_scorer = user_scorer
@@ -64,26 +70,33 @@ class Orchestrator:
     def fit(self, max_docs: int = None) -> BaseDocRepresentation:
         documents = self._get_documents(max_docs)
         logger.info(f"Training model on {len(documents)} documents.")
-        self._document_model.fit(documents)
-        return self._document_model
+        self._topic_model.fit(documents)
+        return self._topic_model
 
     def get_topics(self):
-        return self._document_model.explain()
+        return self._topic_model.explain()
 
     def serialize_model(self, path: str) -> None:
-        pickle.dump(self._document_model, open(path, "wb"))
+        pickle.dump(self._topic_model, open(path, "wb"))
         logger.info(f"Serialized document model to {path}")
 
-    def load_model(self, path: str) -> BaseDocRepresentation:
-        self._document_model = pickle.load(open(path, "rb"))
-        logger.info(f"Model loaded from {path}")
-        return self._document_model
+    def load_topic_model(self, path: str) -> BaseDocRepresentation:
+        self._topic_model = pickle.load(open(path, "rb"))
+        logger.info(f"Topic model loaded from {path}")
+        return self._topic_model
+
+    def load_keyword_model(self, path: str) -> BaseDocRepresentation:
+        self._keyword_model = pickle.load(open(path, "rb"))
+        logger.info(f"Keyword model loaded from {path}")
+        return self._keyword_model
 
     def describe_document(self, document: Document) -> Document:
-        return self._document_model.transform([document])[0]
+        document = self._topic_model(document)
+        document = self._keyword_model(document)
+        return document
 
     def get_named_topics(self, document: Document, min_score=0.05):
-        return self._document_model.get_named_topics(document, min_score=min_score)
+        return self._topic_model.get_named_topics(document, min_score=min_score)
 
     def describe_users(self, users: List[User]) -> np.array:
         return self._user_model.transform(users)
@@ -108,7 +121,7 @@ class Orchestrator:
         documents = self._get_documents()
 
         scored_documents = [
-            self._document_scorer(transformed_query.representation, doc)
+            self._document_scorer(transformed_query, doc)
             for doc in documents
         ]
 
@@ -132,8 +145,7 @@ class Orchestrator:
         transformed_query = self.describe_document(query_doc)
 
         scored_documents = [
-            self._document_scorer(transformed_query.representation, doc)
-            for doc in documents
+            self._document_scorer(transformed_query, doc) for doc in documents
         ]
 
         sorted_documents = sorted(
@@ -149,7 +161,7 @@ class Orchestrator:
         self, query: str, filter_user_documents=True, max_users: int = 5
     ) -> List[User]:
         query_doc = make_document(content=query)
-        transformed_query = self.describe_document(query_doc).representation
+        transformed_query = self.describe_document(query_doc)
 
         users = self._get_users()
 
@@ -182,9 +194,11 @@ class Orchestrator:
             current_demo_document.date = date
 
         simple_document = Document.from_db_model(current_demo_document)
-        current_demo_document.representation = self.describe_document(
+        simple_document = self.describe_document(
             simple_document
-        ).representation
+        )
+        current_demo_document.topic_representation = simple_document.topic_representation
+        current_demo_document.keyword_representation = simple_document.keyword_representation
 
         self.db.session.add(current_demo_document)
         self.db.session.commit()
@@ -192,5 +206,5 @@ class Orchestrator:
         return Document.from_db_model(current_demo_document)
 
     def get_document(self, doc_id):
-        document = self.db.session.query(DbDocument).filter_by(id=-1).one()
+        document = self.db.session.query(DbDocument).filter_by(id=doc_id).one()
         return Document.from_db_model(document)

@@ -9,7 +9,9 @@ from km.representations.users.base import BaseUserRepresentation
 class TopicConcatenator(BaseUserRepresentation):
     def transform(self, users: List[User]) -> List[User]:
         for user in users:
-            representation = np.stack([doc.representation for doc in user.documents])
+            representation = np.stack(
+                [doc.topic_representation for doc in user.documents]
+            )
             user.representation = representation
 
         return users

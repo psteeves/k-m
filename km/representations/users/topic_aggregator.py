@@ -19,7 +19,7 @@ class TopicAggregator(BaseUserRepresentation):
         self.aggregator = aggregator
 
     def _aggregate_doc_representations(self, documents: List[Document]) -> np.array:
-        return self.aggregator([doc.representation for doc in documents])
+        return self.aggregator([doc.topic_representation for doc in documents])
 
     def transform(self, users: List[User]) -> List[User]:
         for user in users:

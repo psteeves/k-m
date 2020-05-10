@@ -52,18 +52,13 @@ def add_doc():
     # TODO fix session error
 
     new_document = ork.create_new_demo_document(title=title, content=content, date=date)
-
-    # Set to None before sending response
-    new_document.representation = new_document.representation.tolist()
-    return jsonify(new_document)
+    return jsonify(new_document.serialize())
 
 
 @api.route("/get/doc", methods=["POST"])
 def get_doc():
     ork = current_app.orchestrator
-    doc_id = request.args.get("doc_id")
-
+    doc_id = request.get_json()["doc_id"]
     document = ork.get_document(doc_id=doc_id)
     document = ork.get_named_topics(document)
-    document.representation = document.representation.tolist()
-    return jsonify(document)
+    return jsonify(document.serialize())

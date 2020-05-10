@@ -1,19 +1,27 @@
 import argparse
+import pickle
 from pathlib import Path
 
 from km.constants import DEFAULT_DATABASE_URI, DEFAULT_SERIALIZED_MODELS_DIR
 from km.orchestrator.orchestrator import Orchestrator
 from km.representations.documents.lda import LDAModel
+from km.representations.documents.tf_idf import TFIDFModel
+
+
+"""
+Script to train models. Keyword arguments currently not supported, so default values must be altered in model classes.
+Only topic model and keyword models supported for training.
+"""
 
 
 def _parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-n",
-        "--num-topics",
-        type=int,
-        default=20,
-        help="Number of topics to detect in LDA model.",
+        "-t",
+        "--model_type",
+        choices=["topic", "keyword"],
+        required=True,
+        help="Type of model to train.",
     )
     parser.add_argument(
         "-m", "--model-name", required=True, help="Name of model.",
@@ -30,12 +38,17 @@ def _parse_args():
 
 def main():
     args = _parse_args()
-    topic_model = LDAModel(n_components=args.num_topics)
-    orchestrator = Orchestrator(db_uri=DEFAULT_DATABASE_URI, document_model=topic_model)
+    model_type = args.model_type
+    if model_type == "topic":
+        model = LDAModel()
+    else:
+        model = TFIDFModel()
+    orchestrator = Orchestrator(db_uri=DEFAULT_DATABASE_URI)
+    documents = orchestrator._get_documents()
 
-    orchestrator.fit()
+    model.fit(documents)
     model_path = (args.serialized_model_dir / args.model_name).with_suffix(".pkl")
-    orchestrator.serialize_model(model_path)
+    pickle.dump(model, open(model_path, "wb"))
 
 
 if __name__ == "__main__":

@@ -15,13 +15,17 @@ class Document:
     date: str
     # Only keep user emails for now
     authors: List["User"] = dataclasses.field(default_factory=list)
-    representation: Optional[np.array] = None
+    topic_representation: Optional[np.array] = None
     topics: Optional[Dict[str, float]] = None
+    keyword_representation: Optional[np.array] = None
+    keywords: Optional[Dict[str, float]] = None
     score: Optional[float] = None
 
     def serialize(self, keep_content=True):
         state = dataclasses.asdict(self)
-        state["representation"] = state["representation"].tolist()
+        state["topic_representation"] = state["topic_representation"].tolist()
+        state["keyword_representation"] = state["keyword_representation"].toarray().tolist()
+        # Keep only email because authors have a ton of documents associated with them.
         state["authors"] = [u["email"] for u in state["authors"]]
         if not keep_content:
             state.pop("content")
@@ -34,7 +38,8 @@ class Document:
             title=db_model.title,
             content=db_model.content,
             date=db_model.date,
-            representation=db_model.representation,
+            topic_representation=db_model.topic_representation,
+            keyword_representation=db_model.keyword_representation,
             authors=db_model.users if get_authors else [],
         )
 
@@ -59,7 +64,8 @@ class User:
         state.pop("representation")
 
         for doc in state["documents"]:
-            doc.pop("representation")
+            doc.pop("topic_representation")
+            doc.pop("keyword_representation")
             if not keep_content:
                 doc.pop("content")
         return state

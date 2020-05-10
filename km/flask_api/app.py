@@ -25,8 +25,11 @@ def create_app():
 def _register_orchestrator(app):
     db_uri = app.config["DATABASE_URI"]
     orchestrator = Orchestrator(db_uri=db_uri)
-    orchestrator.load_model(
-        app.config["SERIALIZED_MODEL_DIR"] + app.config["SERIALIZED_MODEL_NAME"]
+    orchestrator.load_topic_model(
+        app.config["SERIALIZED_MODEL_DIR"] + app.config["SERIALIZED_TOPIC_MODEL_NAME"]
+    )
+    orchestrator.load_keyword_model(
+        app.config["SERIALIZED_MODEL_DIR"] + app.config["SERIALIZED_KEYWORD_MODEL_NAME"]
     )
     app.orchestrator = orchestrator
 
