@@ -21,8 +21,8 @@ class User extends React.Component {
                 <CardContent>
                     <Typography variant="body1" align="left" className="right-pane-title">Match</Typography>
 
-                    { /* User scores range from 0 to 1, but mostly around 0 */ }
-                    <Typography align="left">{(80 * 100 * this.props.user.score).toFixed(0)}%</Typography>
+                    { /* User scores range from 0 to 1 */ }
+                    <Typography align="left">{(100 * this.props.user.score).toFixed(0)}%</Typography>
 
                     <Typography variant="body1" align="left" className="right-pane-title">Details</Typography>
                     <Typography variant="body1" align="left" className="right-pane-item"><i>Email:</i> {this.props.user.email}</Typography>

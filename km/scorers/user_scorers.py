@@ -1,10 +1,7 @@
-import numpy as np
-
 
 class ExponentiallyWeightedDocSimilarity:
-    def __init__(self, similarity_measure, power=10):
+    def __init__(self, similarity_measure):
         # Exponential factor to weight similarity
-        self._power = power
         self._similarity_measure = similarity_measure
         self.higher_is_better = True
 
@@ -15,7 +12,7 @@ class ExponentiallyWeightedDocSimilarity:
 
         for doc in user.documents:
             similarity = self._similarity_measure(query_vector, doc).score
-            score += np.e ** (-self._power * similarity)
+            score += similarity
         return score / len(user.documents)
 
     def __call__(self, query_vector, user):

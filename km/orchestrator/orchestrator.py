@@ -12,8 +12,6 @@ from km.db.models import Document as DbDocument
 from km.representations.documents.base import BaseDocRepresentation
 from km.representations.documents.lda import LDAModel
 from km.representations.documents.tf_idf import TFIDFModel
-from km.representations.users.base import BaseUserRepresentation
-from km.representations.users.topic_concatenator import TopicConcatenator
 from km.scorers.document_scorers import CosineSimilarityScorer
 from km.scorers.user_scorers import ExponentiallyWeightedDocSimilarity
 from km.utils import make_document
@@ -27,7 +25,6 @@ class Orchestrator:
         db_uri: str,
         topic_model: Optional[BaseDocRepresentation] = None,
         keyword_model: Optional[BaseDocRepresentation] = None,
-        user_model: Optional[BaseUserRepresentation] = None,
         document_scorer=None,
         user_scorer=None,
     ):
@@ -36,9 +33,6 @@ class Orchestrator:
 
         if keyword_model is None:
             keyword_model = TFIDFModel()
-
-        if user_model is None:
-            user_model = TopicConcatenator()
 
         if document_scorer is None:
             document_scorer = CosineSimilarityScorer()
@@ -50,7 +44,6 @@ class Orchestrator:
 
         self._topic_model = topic_model
         self._keyword_model = keyword_model
-        self._user_model = user_model
         self._document_scorer = document_scorer
         self._user_scorer = user_scorer
 
@@ -100,9 +93,6 @@ class Orchestrator:
 
     def get_named_keywords(self, document: Document, top_k=8):
         return self._keyword_model.get_named_keywords(document, top_k=top_k)
-
-    def describe_users(self, users: List[User]) -> np.array:
-        return self._user_model.transform(users)
 
     def _get_authors_for_documents(self, documents: List[Document]):
         """
