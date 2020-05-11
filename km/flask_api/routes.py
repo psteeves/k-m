@@ -61,4 +61,5 @@ def get_doc():
     doc_id = request.get_json()["doc_id"]
     document = ork.get_document(doc_id=doc_id)
     document = ork.get_named_topics(document)
+    document = ork.get_named_keywords(document)
     return jsonify(document.serialize())

@@ -24,7 +24,9 @@ class Document:
     def serialize(self, keep_content=True):
         state = dataclasses.asdict(self)
         state["topic_representation"] = state["topic_representation"].tolist()
-        state["keyword_representation"] = state["keyword_representation"].toarray().tolist()
+        state["keyword_representation"] = (
+            state["keyword_representation"].toarray().tolist()
+        )
         # Keep only email because authors have a ton of documents associated with them.
         state["authors"] = [u["email"] for u in state["authors"]]
         if not keep_content:

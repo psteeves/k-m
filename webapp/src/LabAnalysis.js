@@ -86,6 +86,9 @@ class LabAnalysis extends React.Component {
                 <div className="topics-viz"></div>
                 <br/><br/><br/>
                 <Typography variant="h4">Important keywords</Typography>
+                <ul>
+                {Object.keys(this.props.document.keywords).map(w => <li>{w}</li>)}
+                </ul>
             </div>
 
         )
