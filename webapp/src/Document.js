@@ -16,7 +16,7 @@ class Document extends React.Component {
                 <CardContent>
                     <Typography variant="body1" align="left" className="right-pane-title">Match</Typography>
                     {/* User scores range from 0 to 1 */}
-                    <Typography variant="body1" align="left">{(100 * (1 - this.props.document.score)).toFixed(0)}%</Typography>
+                    <Typography variant="body1" align="left">{(100 * this.props.document.score).toFixed(0)}%</Typography>
 
                     <Typography variant="body1" align="left" className="right-pane-title">Details</Typography>
                     <Typography variant="body1" align="left" className="right-pane-item"><i>Created:</i> {this.props.document.date}</Typography>

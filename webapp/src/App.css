@@ -100,3 +100,9 @@ header {
     font-weight: 900 !important;
     margin-top: 20px !important;
 }
+
+.keyword-list {
+    display: flex;
+    flex-direction: column;
+    float: left;
+}

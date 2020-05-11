@@ -17,7 +17,7 @@ class TFIDFModel(BaseDocRepresentation):
 
     def transform(self, document: Document) -> Document:
         text = document.content
-        representation = self._tf_idf_model.transform([text])[0]
+        representation = self._tf_idf_model.transform([text])
         document.keyword_representation = representation
         return document
 

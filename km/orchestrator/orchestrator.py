@@ -14,7 +14,7 @@ from km.representations.documents.lda import LDAModel
 from km.representations.documents.tf_idf import TFIDFModel
 from km.representations.users.base import BaseUserRepresentation
 from km.representations.users.topic_concatenator import TopicConcatenator
-from km.scorers.document_scorers import EuclidianSimilarityScorer
+from km.scorers.document_scorers import CosineSimilarityScorer
 from km.scorers.user_scorers import ExponentiallyWeightedDocSimilarity
 from km.utils import make_document
 
@@ -41,7 +41,7 @@ class Orchestrator:
             user_model = TopicConcatenator()
 
         if document_scorer is None:
-            document_scorer = EuclidianSimilarityScorer()
+            document_scorer = CosineSimilarityScorer()
 
         if user_scorer is None:
             user_scorer = ExponentiallyWeightedDocSimilarity(
@@ -98,6 +98,9 @@ class Orchestrator:
     def get_named_topics(self, document: Document, min_score=0.05):
         return self._topic_model.get_named_topics(document, min_score=min_score)
 
+    def get_named_keywords(self, document: Document, top_k=8):
+        return self._keyword_model.get_named_keywords(document, top_k=top_k)
+
     def describe_users(self, users: List[User]) -> np.array:
         return self._user_model.transform(users)
 
@@ -121,8 +124,7 @@ class Orchestrator:
         documents = self._get_documents()
 
         scored_documents = [
-            self._document_scorer(transformed_query, doc)
-            for doc in documents
+            self._document_scorer(transformed_query, doc) for doc in documents
         ]
 
         sorted_documents = sorted(
@@ -194,11 +196,13 @@ class Orchestrator:
             current_demo_document.date = date
 
         simple_document = Document.from_db_model(current_demo_document)
-        simple_document = self.describe_document(
-            simple_document
+        simple_document = self.describe_document(simple_document)
+        current_demo_document.topic_representation = (
+            simple_document.topic_representation
         )
-        current_demo_document.topic_representation = simple_document.topic_representation
-        current_demo_document.keyword_representation = simple_document.keyword_representation
+        current_demo_document.keyword_representation = (
+            simple_document.keyword_representation
+        )
 
         self.db.session.add(current_demo_document)
         self.db.session.commit()
