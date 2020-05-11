@@ -2,6 +2,7 @@ import React from 'react';
 import Document from './Document';
 import Typography from '@material-ui/core/Typography';
 import { searchDocuments } from "./CoLabAPI";
+import Progress from "./Progress";
 
 
 class DocumentResults extends React.Component {
@@ -17,11 +18,12 @@ class DocumentResults extends React.Component {
     }
 
     render() {
+        const results = this.state.documents.length === 0 ?  <Progress/> : this.state.documents.map(doc => <Document document={doc}/>);
         return (
             <div>
-                <Typography variant="h3">Most similar internal documents</Typography>
+                <Typography variant="h3">Relevant internal documents</Typography>
                 <div className="results-list">
-                {this.state.documents.map(doc => <Document document={doc}/>)}
+                {results}
                 </div>
             </div>
         )

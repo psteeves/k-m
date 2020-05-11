@@ -106,3 +106,11 @@ header {
     flex-direction: column;
     float: left;
 }
+
+.progress-bar {
+    margin-top: 50px;
+}
+
+.MuiCircularProgress-circle {
+    color: red;
+}
