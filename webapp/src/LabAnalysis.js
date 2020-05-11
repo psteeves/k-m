@@ -1,6 +1,7 @@
 import React from 'react';
 import * as d3 from 'd3';
 import Typography from '@material-ui/core/Typography';
+import Keyword from './Keyword';
 
 
 class LabAnalysis extends React.Component {
@@ -56,7 +57,7 @@ class LabAnalysis extends React.Component {
           .data(data)
           .enter()
           .append("text")
-            .text((d, i) => i === this.state.selectedTopic? `Topic keywords: ${d.topic}` : "")
+            .text((d, i) => i === this.state.selectedTopic? `Topic description: ${d.topic}` : "")
             .attr("x", total_width - legend_width + 10)
             .attr("y", () => total_height / 3)
             .attr("font-size", "14px")
@@ -85,10 +86,10 @@ class LabAnalysis extends React.Component {
                 <br/>
                 <div className="topics-viz"></div>
                 <br/><br/><br/>
-                <Typography variant="h4">Important keywords</Typography>
-                <ul>
-                {Object.keys(this.props.document.keywords).map(w => <li>{w}</li>)}
-                </ul>
+                <Typography variant="h4" gutterBottom>Important keywords</Typography>
+                <div className="keyword-list">
+                {Object.keys(this.props.document.keywords).map(w => <Keyword keyword={w} />)}
+                </div>
             </div>
 
         )
