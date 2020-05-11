@@ -8,6 +8,14 @@ header {
     background-color: rgba(106, 106, 106, 0.89);
 }
 
+
+ul {
+    list-style-type: circle;
+    padding: 0;
+    padding-left: 15px;
+    margin: 0;
+}
+
 .company-name {
     font-size: 50px;
     color: rgb(0, 0, 0);
@@ -65,26 +73,20 @@ header {
     border-bottom: 2px solid;
 }
 
-.document-result {
+.result {
     background-color: rgba(0, 0, 0, 0.04) !important;
     display: flex;
-    height: 500px;
     width: 1600px;
     margin: 40px;
 }
 
-.user-result {
-    background-color: rgba(0, 0, 0, 0.04) !important;
-    display: flex;
-    height: 500px;
-    width: 1600px;
-    margin: 40px;
+.result-right {
+    margin-top: 30px;
 }
 
 .user-result-left {
     width: 400px;
     margin-right: 50px;
-    text-align: left;
 }
 
 .user-photo {
@@ -112,5 +114,5 @@ header {
 }
 
 .MuiCircularProgress-circle {
-    color: red;
+    color: #3f51b5;
 }

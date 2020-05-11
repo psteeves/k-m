@@ -10,16 +10,16 @@ class User extends React.Component {
     render() {
         const im_path = this.props.user.image_path.replace("/home/psteeves/k-m/data/news-articles/", "");
         return (
-            <Card className="user-result">
+            <Card className="result">
                 <CardContent className="user-result-left">
-                    <Typography variant="h5" gutterBottom align="left" className="user-title">{this.props.user.name}</Typography>
+                    <Typography variant="h5" gutterBottom >{this.props.user.name}</Typography>
                     <CardMedia>
                         <img className="user-photo" src={im_path} alt="" height="320" width="240"/>
                     </CardMedia>
-                    <Button variant="outlined" >Message on Slack</Button>
+                    <Button variant="contained" color="primary">Message</Button>
                 </CardContent>
-                <CardContent>
-                    <Typography variant="body1" align="left" className="right-pane-title">Match</Typography>
+                <CardContent className="result-right">
+                    <Typography variant="body1" align="left" className="right-pane-title">Relevance Score</Typography>
 
                     { /* User scores range from 0 to 1 */ }
                     <Typography align="left">{(100 * this.props.user.score).toFixed(0)}%</Typography>
