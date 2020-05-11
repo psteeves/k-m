@@ -5,7 +5,7 @@ import Typography from '@material-ui/core/Typography';
 class Keyword extends React.Component {
     render() {
         return (
-                <Typography>{this.props.keyword}</Typography>
+                <Typography>{this.props.keyword.toUpperCase()}</Typography>
         )
     }
 }

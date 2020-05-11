@@ -57,9 +57,20 @@ class LabAnalysis extends React.Component {
           .data(data)
           .enter()
           .append("text")
-            .text((d, i) => i === this.state.selectedTopic? `Topic description: ${d.topic}` : "")
-            .attr("x", total_width - legend_width + 10)
+            .text((d, i) => i === this.state.selectedTopic? `Topic ${i + 1}` : "")
+            .attr("x", total_width - legend_width - 10)
             .attr("y", () => total_height / 3)
+            .attr("font-size", "20px")
+            .attr("text-anchor", "left")
+            .style("alignment-baseline", "middle");
+
+        svg.selectAll("legend")
+          .data(data)
+          .enter()
+          .append("text")
+            .text((d, i) => i === this.state.selectedTopic? `${d.topic.toUpperCase()}` : "")
+            .attr("x", total_width - legend_width - 10)
+            .attr("y", () => total_height / 2.4)
             .attr("font-size", "14px")
             .attr("text-anchor", "left")
             .style("alignment-baseline", "middle");
@@ -72,7 +83,7 @@ class LabAnalysis extends React.Component {
             .attr("y", d => y(d.score))
             .attr("width", x.bandwidth())
             .attr("height", (d) => chart_height - y(d.score))
-            .attr("fill", (d, i) => i === this.state.selectedTopic? "black" : "grey")
+            .attr("fill", (d, i) => i === this.state.selectedTopic? "#3f51b5" : "grey")
             .on("click", this.handleClick);
     };
 
@@ -81,14 +92,15 @@ class LabAnalysis extends React.Component {
         return (
             <div>
                 <br/>
-                <Typography variant="h4">Document Topics</Typography>
+                <Typography variant="h4">Topics</Typography>
                 <Typography variant="body1" gutterBottom><i>Click topics to inspect</i></Typography>
                 <br/>
                 <div className="topics-viz"></div>
                 <br/><br/><br/>
-                <Typography variant="h4" gutterBottom>Important keywords</Typography>
+                <Typography variant="h4" gutterBottom>Keywords</Typography>
                 <div className="keyword-list">
                 {Object.keys(this.props.document.keywords).map(w => <Keyword keyword={w} />)}
+                <br/>
                 </div>
             </div>
 
