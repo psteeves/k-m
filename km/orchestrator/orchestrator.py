@@ -14,7 +14,7 @@ from km.representations.documents.lda import LDAModel
 from km.representations.documents.tf_idf import TFIDFModel
 from km.representations.users.base import BaseUserRepresentation
 from km.representations.users.topic_concatenator import TopicConcatenator
-from km.scorers.document_scorers import EuclidianSimilarityScorer
+from km.scorers.document_scorers import CosineSimilarityScorer
 from km.scorers.user_scorers import ExponentiallyWeightedDocSimilarity
 from km.utils import make_document
 
@@ -41,7 +41,7 @@ class Orchestrator:
             user_model = TopicConcatenator()
 
         if document_scorer is None:
-            document_scorer = EuclidianSimilarityScorer()
+            document_scorer = CosineSimilarityScorer()
 
         if user_scorer is None:
             user_scorer = ExponentiallyWeightedDocSimilarity(

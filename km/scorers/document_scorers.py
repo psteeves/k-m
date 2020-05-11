@@ -1,18 +1,18 @@
-import numpy as np
+from scipy.spatial.distance import cosine as cosine_distance
 
 
-class EuclidianSimilarityScorer:
-    higher_is_better = False
+class CosineSimilarityScorer:
+    higher_is_better = True
 
     def __call__(self, query_doc, doc):
-        topic_score = np.linalg.norm(
-            query_doc.topic_representation - doc.topic_representation
+        topic_score = cosine_distance(
+            query_doc.topic_representation, doc.topic_representation
         )
-        # Cosine distance
-        query_keywords = query_doc.keyword_representation.toarray()[0]
-        doc_keywords = doc.keyword_representation.toarray()[0]
-        keyword_score = 1 - np.dot(query_keywords, doc_keywords) / (
-            np.linalg.norm(query_keywords) * np.linalg.norm(doc_keywords)
+
+        keyword_score = cosine_distance(
+            query_doc.keyword_representation.toarray()[0],
+            doc.keyword_representation.toarray()[0],
         )
-        doc.score = topic_score + keyword_score
+        # Score will be between 0 and 1
+        doc.score = 1 - (topic_score + keyword_score) / 2
         return doc
