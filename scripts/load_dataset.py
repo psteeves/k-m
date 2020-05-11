@@ -11,7 +11,6 @@ from km.data_models import Document as SimpleDocument
 from km.data_models import User as SimpleUser
 from km.db.models import Document, User
 from km.db.utils import create_table, session_scope
-from km.representations.users.topic_concatenator import TopicConcatenator
 
 logger = get_logger(__file__)
 
@@ -52,7 +51,6 @@ def get_files(path: Path, uri: str) -> None:
     create_table(uri)
     topic_model = pickle.load(open(args.serialized_topic_model, "rb"))
     keyword_model = pickle.load(open(args.serialized_keyword_model, "rb"))
-    user_representation_model = TopicConcatenator()
 
     with session_scope(uri) as session:
         documents_dir = path / "documents"
@@ -69,13 +67,9 @@ def get_files(path: Path, uri: str) -> None:
                 id=doc_id, title=doc["title"], content=doc["content"], date=doc["date"]
             )
             simple_document = SimpleDocument.from_db_model(doc_model)
-            doc_model.topic_representation = topic_model([simple_document])[
-                0
-            ].topic_representation
+            doc_model.topic_representation = topic_model(simple_document).topic_representation
 
-            doc_model.keyword_representation = keyword_model([simple_document])[
-                0
-            ].keyword_representation
+            doc_model.keyword_representation = keyword_model(simple_document).keyword_representation
 
             # Add to DB
             session.add(doc_model)
@@ -95,9 +89,7 @@ def get_files(path: Path, uri: str) -> None:
             for doc_id in info["document_ids"]:
                 doc = docs[int(doc_id)]
                 user_model.documents.append(doc)
-            user_model.representation = user_representation_model(
-                [SimpleUser.from_db_model(user_model)]
-            )[0].representation
+
             session.add(user_model)
 
         session.commit()
