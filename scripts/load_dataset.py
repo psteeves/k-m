@@ -32,10 +32,16 @@ def _parse_args():
         help="URI of SQLite DB to load data to.",
     )
     parser.add_argument(
-        "-m",
-        "--serialized-model",
+        "-t",
+        "--serialized-topic-model",
         required=True,
-        help="Path to serialized model to use",
+        help="Path to serialized topic model to use",
+    )
+    parser.add_argument(
+        "-k",
+        "--serialized-keyword-model",
+        required=True,
+        help="Path to serialized keyword model to use",
     )
     return parser.parse_args()
 
@@ -44,7 +50,8 @@ def get_files(path: Path, uri: str) -> None:
     if Path(uri.split("/")[-1]).exists():
         raise RuntimeError("DB already exists.")
     create_table(uri)
-    document_representation_model = pickle.load(open(args.serialized_model, "rb"))
+    topic_model = pickle.load(open(args.serialized_topic_model, "rb"))
+    keyword_model = pickle.load(open(args.serialized_keyword_model, "rb"))
     user_representation_model = TopicConcatenator()
 
     with session_scope(uri) as session:
@@ -56,14 +63,21 @@ def get_files(path: Path, uri: str) -> None:
         for doc_path in tqdm.tqdm(doc_paths):
             doc_id = int(doc_path.stem)
             doc = json.load(open(doc_path))
+
+            # Compute representations
             doc_model = Document(
                 id=doc_id, title=doc["title"], content=doc["content"], date=doc["date"]
             )
             simple_document = SimpleDocument.from_db_model(doc_model)
-            representation = document_representation_model([simple_document])[
+            doc_model.topic_representation = topic_model([simple_document])[
                 0
-            ].representation
-            doc_model.representation = representation
+            ].topic_representation
+
+            doc_model.keyword_representation = keyword_model([simple_document])[
+                0
+            ].keyword_representation
+
+            # Add to DB
             session.add(doc_model)
             docs[doc_id] = doc_model
 

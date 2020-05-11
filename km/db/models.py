@@ -19,7 +19,8 @@ class Document(Base):
     title = Column(String, nullable=False)
     date = Column(String, nullable=False)
     content = Column(String, nullable=False)
-    representation = Column(PickleType, nullable=True)
+    topic_representation = Column(PickleType, nullable=True)
+    keyword_representation = Column(PickleType, nullable=True)
     users = relationship("User", secondary=user_documents, back_populates="documents")
 
 

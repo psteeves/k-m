@@ -12,5 +12,5 @@ class BaseDocRepresentation:
     def transform(self, documents: List[Document]) -> List[Document]:
         pass
 
-    def __call__(self, documents: List[Document]) -> List[Document]:
-        return self.transform(documents)
+    def __call__(self, document: Document) -> Document:
+        return self.transform(document)

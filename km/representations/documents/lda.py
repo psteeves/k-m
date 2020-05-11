@@ -8,7 +8,7 @@ from km.representations.documents.base import BaseDocRepresentation
 
 
 class LDAModel(BaseDocRepresentation):
-    def __init__(self, n_components, max_df=0.25, min_df=0.0005):
+    def __init__(self, n_components=20, max_df=0.25, min_df=0.0005):
         self._count_vectorizer = CountVectorizer(
             max_df=max_df, min_df=min_df, stop_words="english"
         )
@@ -21,20 +21,19 @@ class LDAModel(BaseDocRepresentation):
         term_frequencies = self._count_vectorizer.fit_transform(texts)
         self._lda_model.fit(term_frequencies)
 
-    def transform(self, documents: List[Document]) -> List[Document]:
-        texts = [doc.content for doc in documents]
-        term_frequencies = self._count_vectorizer.transform(texts)
-        representations = self._lda_model.transform(term_frequencies)
-        for i, doc in enumerate(documents):
-            doc.representation = representations[i]
-        return documents
+    def transform(self, document: Document) -> Document:
+        text = document.content
+        term_frequencies = self._count_vectorizer.transform([text])
+        representation = self._lda_model.transform(term_frequencies)[0]
+        document.topic_representation = representation
+        return document
 
     def get_named_topics(self, document: Document, min_score=0.05) -> Document:
         global_topics = self.explain()
 
         named_topics = {
             ", ".join(list(global_topics[i].keys())): score
-            for i, score in enumerate(document.representation.tolist())
+            for i, score in enumerate(document.topic_representation.tolist())
         }
         document.topics = {
             topic: score for topic, score in named_topics.items() if score > min_score

@@ -11,7 +11,7 @@ import { Route } from 'react-router-dom';
 class App extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {document: {title: '', content: '', representation: [], topics: {}, authors: []}}
+        this.state = {document: undefined}
     }
 
     componentDidMount() {
@@ -28,7 +28,7 @@ class App extends React.Component {
                 </header>
                 <SearchBar/>
                 <Route exact path="/" render={() => (
-                    <Lab document={this.state.document}/>
+                    this.state.document &&  <Lab document={this.state.document}/>
                 )}
                 />
                 <Route path="/documents" render={() => (
