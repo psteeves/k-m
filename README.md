@@ -1,1 +1,1 @@
-# Know thyself
+# Knowledge management demo
